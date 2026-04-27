@@ -1,5 +1,5 @@
-const { Router } = require('express');
-const ticketsController = require('../controllers/tickets.controller');
+import { Router } from 'express';
+import ticketsController from '../controllers/tickets.controller.js';
 
 const router = Router();
 
@@ -10,4 +10,4 @@ router.post('/', ticketsController.store);
 router.patch('/:id', ticketsController.update);
 router.post('/:id/comments', ticketsController.addComment);
 
-module.exports = router;
+export default router;

@@ -14,4 +14,4 @@ class UsersRepository {
   }
 }
 
-module.exports = new UsersRepository();
+export default new UsersRepository();

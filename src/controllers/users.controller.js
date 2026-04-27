@@ -1,4 +1,4 @@
-const usersRepository = require('../repositories/users.repository');
+import usersRepository from '../repositories/users.repository.js';
 
 class UsersController {
   index(req, res) {
@@ -7,4 +7,4 @@ class UsersController {
   }
 }
 
-module.exports = new UsersController();
+export default new UsersController();

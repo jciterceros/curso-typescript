@@ -1,4 +1,4 @@
-const ticketsService = require('../services/tickets.service');
+import ticketsService from '../services/tickets.service.js';
 
 class TicketsController {
   index(req, res) {
@@ -49,4 +49,4 @@ class TicketsController {
   }
 }
 
-module.exports = new TicketsController();
+export default new TicketsController();

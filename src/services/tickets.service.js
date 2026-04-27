@@ -1,5 +1,5 @@
-const ticketsRepository = require('../repositories/tickets.repository');
-const commentsRepository = require('../repositories/comments.repository');
+import ticketsRepository from '../repositories/tickets.repository.js';
+import commentsRepository from '../repositories/comments.repository.js';
 
 class TicketsService {
   listTickets(filters) {
@@ -71,4 +71,4 @@ class TicketsService {
   }
 }
 
-module.exports = new TicketsService();
+export default new TicketsService();

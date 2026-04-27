@@ -1,4 +1,4 @@
-const { generateId } = require('../utils/id');
+import { generateId } from '../utils/id.js';
 
 const comments = [
   {
@@ -26,4 +26,4 @@ class CommentsRepository {
   }
 }
 
-module.exports = new CommentsRepository();
+export default new CommentsRepository();

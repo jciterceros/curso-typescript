@@ -1,4 +1,4 @@
-const { generateId } = require('../utils/id');
+import { generateId } from '../utils/id.js';
 
 const tickets = [
   {
@@ -59,4 +59,4 @@ class TicketsRepository {
   }
 }
 
-module.exports = new TicketsRepository();
+export default new TicketsRepository();

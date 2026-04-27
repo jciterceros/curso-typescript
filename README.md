@@ -1,69 +1,348 @@
 # Helpdesk API
 
-Uma API REST simples desenvolvida em Node.js e Express para o gerenciamento de tickets de suporte técnico. Esta aplicação utiliza persistência em memória para facilitar o desenvolvimento e testes locais.
+API REST simples desenvolvida em Node.js e Express para gerenciamento de tickets de suporte tecnico. A aplicacao usa persistencia em memoria, entao os dados voltam ao estado inicial sempre que o servidor e reiniciado.
 
 ## Como rodar
 
-1. Instale as dependências:
-   ```bash
-   npm install
-   ```
+### Usando os atalhos do projeto
 
-2. Inicie o servidor:
-   ```bash
-   node src/app.js
-   ```
+Use os atalhos da raiz do projeto:
 
-A API estará disponível em `http://localhost:3000`.
+```bat
+iniciar-dev.bat
+```
 
-## Endpoints Principais
+ou:
 
-### Tickets
+```bat
+abrir-cmd-node.bat
+npm run dev
+```
 
-* `GET /tickets` - Listar tickets (suporta filtros por `status`, `priority`, `limit` e `page`)
-* `GET /tickets/:id` - Buscar detalhes de um ticket específico por ID
-* `POST /tickets` - Registrar um novo ticket de suporte
-* `PATCH /tickets/:id` - Atualizar informações de um ticket existente
-* `POST /tickets/:id/comments` - Adicionar um comentário a um ticket
+### Usando Node instalado na maquina
 
-### Usuários
-
-* `GET /users` - Listar usuários cadastrados no sistema
-
-## Exemplos de Uso
-
-### 1. Criar um novo ticket
 ```bash
-curl -X POST http://localhost:3000/tickets \
+npm install
+npm run dev
+```
+
+A API fica disponivel em:
+
+```text
+http://localhost:3000
+```
+
+## Endpoints
+
+Base URL local:
+
+```text
+http://localhost:3000
+```
+
+### GET /tickets
+
+Lista tickets cadastrados.
+
+Query params opcionais:
+
+| Parametro | Tipo | Descricao |
+| --- | --- | --- |
+| `status` | string | Filtra por status exato, por exemplo `open` ou `in_progress`. |
+| `priority` | number/string | Filtra por prioridade. A API compara com igualdade flexivel. |
+| `limit` | number | Quantidade de tickets por pagina. Padrao: `10`. |
+| `page` | number | Pagina desejada. Padrao: `1`. |
+
+Exemplo:
+
+```bash
+curl "http://localhost:3000/tickets?limit=5&page=1&status=open"
+```
+
+Resposta:
+
+```json
+{
+  "data": [
+    {
+      "id": "t1",
+      "title": "Erro no login",
+      "description": "Nao consigo acessar o sistema com minha senha.",
+      "status": "open",
+      "priority": 5,
+      "assigneeId": "u1",
+      "createdAt": "2026-04-27T00:00:00.000Z",
+      "updatedAt": "2026-04-27T00:00:00.000Z"
+    }
+  ],
+  "total": 1
+}
+```
+
+### GET /tickets/:id
+
+Busca um ticket por ID e inclui os comentarios relacionados.
+
+Path params:
+
+| Parametro | Tipo | Descricao |
+| --- | --- | --- |
+| `id` | string | ID do ticket, por exemplo `t1`. |
+
+Exemplo:
+
+```bash
+curl "http://localhost:3000/tickets/t1"
+```
+
+Resposta `200`:
+
+```json
+{
+  "id": "t1",
+  "title": "Erro no login",
+  "description": "Nao consigo acessar o sistema com minha senha.",
+  "status": "open",
+  "priority": 5,
+  "assigneeId": "u1",
+  "createdAt": "2026-04-27T00:00:00.000Z",
+  "updatedAt": "2026-04-27T00:00:00.000Z",
+  "comments": [
+    {
+      "id": "c1",
+      "ticketId": "t1",
+      "authorId": "u2",
+      "message": "Ja estamos verificando o servidor de autenticacao.",
+      "createdAt": "2026-04-27T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+Resposta `404`:
+
+```json
+{
+  "error": "Ticket not found"
+}
+```
+
+### GET /tickets/:id/summary
+
+Retorna um resumo do ticket.
+
+Path params:
+
+| Parametro | Tipo | Descricao |
+| --- | --- | --- |
+| `id` | string | ID do ticket, por exemplo `t1`. |
+
+Exemplo:
+
+```bash
+curl "http://localhost:3000/tickets/t1/summary"
+```
+
+Resposta `200`:
+
+```json
+{
+  "title": "Erro no login",
+  "assigned_to": "u1",
+  "created": "27/04/2026"
+}
+```
+
+Observacao: o campo `short_desc` existe no codigo, mas hoje sai como `undefined`, porque o service usa `ticket.desc` enquanto os tickets possuem `description`.
+
+Resposta `404`:
+
+```json
+{
+  "error": "Ticket not found"
+}
+```
+
+### POST /tickets
+
+Cria um ticket.
+
+Body JSON:
+
+| Campo | Tipo | Obrigatorio | Descricao |
+| --- | --- | --- | --- |
+| `title` | string | Recomendado | Titulo do ticket. |
+| `description` | string | Recomendado | Descricao do problema. |
+| `status` | string | Recomendado | Status inicial, por exemplo `open`. |
+| `priority` | number/string | Recomendado | Prioridade do ticket. |
+| `assigneeId` | string | Recomendado | ID do usuario responsavel. |
+
+Exemplo:
+
+```bash
+curl -X POST "http://localhost:3000/tickets" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Erro no acesso ao sistema",
-    "description": "Usuário não consegue realizar login após atualização",
+    "description": "Usuario nao consegue realizar login apos atualizacao",
     "status": "open",
     "priority": 2,
     "assigneeId": "u1"
   }'
 ```
 
-### 2. Atualizar informações de um ticket
+Resposta `201`:
+
+```json
+{
+  "ticket": {
+    "id": "abc123",
+    "title": "Erro no acesso ao sistema",
+    "description": "Usuario nao consegue realizar login apos atualizacao",
+    "status": "open",
+    "priority": 2,
+    "assigneeId": "u1",
+    "createdAt": "2026-04-27T00:00:00.000Z",
+    "updatedAt": "2026-04-27T00:00:00.000Z"
+  }
+}
+```
+
+### PATCH /tickets/:id
+
+Atualiza parcialmente um ticket existente.
+
+Path params:
+
+| Parametro | Tipo | Descricao |
+| --- | --- | --- |
+| `id` | string | ID do ticket, por exemplo `t1`. |
+
+Body JSON:
+
+Envie apenas os campos que deseja alterar, por exemplo `title`, `description`, `status`, `priority` ou `assigneeId`.
+
+Exemplo:
+
 ```bash
-curl -X PATCH http://localhost:3000/tickets/t1 \
+curl -X PATCH "http://localhost:3000/tickets/t1" \
   -H "Content-Type: application/json" \
   -d '{
     "status": "in_progress"
   }'
 ```
 
-### 3. Listar tickets com paginação e filtros
-```bash
-curl "http://localhost:3000/tickets?limit=5&page=1&status=open"
+Resposta `200`:
+
+```json
+{
+  "id": "t1",
+  "title": "Erro no login",
+  "description": "Nao consigo acessar o sistema com minha senha.",
+  "status": "in_progress",
+  "priority": 5,
+  "assigneeId": "u1",
+  "createdAt": "2026-04-27T00:00:00.000Z",
+  "updatedAt": "2026-04-27T00:00:00.000Z"
+}
 ```
 
-## Scripts de Utilidade
+Resposta `404`:
 
-A pasta `scripts/` contém rotinas para automatizar testes e interações comuns com a API:
+```json
+{
+  "error": "Ticket not found"
+}
+```
 
-* `node scripts/create-ticket.js`: Executa o fluxo de criação de um novo ticket de teste.
-* `node scripts/list-tickets.js`: Realiza a listagem de tickets utilizando parâmetros de busca.
-* `node scripts/update-ticket.js`: Testa a atualização de dados em tickets existentes.
-* `node scripts/check-consistency.js`: Utilitário para verificação de integridade das respostas da API.
+### POST /tickets/:id/comments
+
+Adiciona um comentario a um ticket.
+
+Path params:
+
+| Parametro | Tipo | Descricao |
+| --- | --- | --- |
+| `id` | string | ID do ticket, por exemplo `t1`. |
+
+Body JSON:
+
+| Campo | Tipo | Obrigatorio | Descricao |
+| --- | --- | --- | --- |
+| `authorId` | string | Recomendado | ID do usuario que comentou. |
+| `message` | string | Recomendado | Texto do comentario. |
+
+Exemplo:
+
+```bash
+curl -X POST "http://localhost:3000/tickets/t1/comments" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "authorId": "u2",
+    "message": "Estamos analisando o problema."
+  }'
+```
+
+Resposta `201`:
+
+```json
+{
+  "id": "abc123",
+  "ticketId": "t1",
+  "authorId": "u2",
+  "message": "Estamos analisando o problema.",
+  "createdAt": "2026-04-27T00:00:00.000Z"
+}
+```
+
+Resposta `404`:
+
+```json
+{
+  "error": "Ticket not found"
+}
+```
+
+### GET /users
+
+Lista usuarios cadastrados.
+
+Exemplo:
+
+```bash
+curl "http://localhost:3000/users"
+```
+
+Resposta `200`:
+
+```json
+[
+  {
+    "id": "u1",
+    "name": "Alice Suporte",
+    "email": "alice@helpdesk.com"
+  },
+  {
+    "id": "u2",
+    "name": "Bob Tecnico",
+    "email": "bob@helpdesk.com"
+  },
+  {
+    "id": "u3",
+    "name": "Charlie Usuario",
+    "email": "charlie@gmail.com"
+  }
+]
+```
+
+## Testes automatizados
+
+Para validar o contrato final esperado depois da migracao para TypeScript, rode:
+
+```bat
+npm test
+```
+
+A suite usa Vitest e Supertest para testar a API Express sem precisar iniciar o servidor em `localhost:3000`.
+
+Esses testes substituem os scripts manuais antigos da pasta `scripts/`. Eles verificam os principais criterios do roteiro de migracao: payload valido e invalido, filtros por query params, conversao de `priority`, tratamento de `404`, resumo do ticket, `PATCH` com campos permitidos e comentarios.

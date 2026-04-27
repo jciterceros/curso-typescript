@@ -1,0 +1,34 @@
+info:
+  name: Add Ticket Comment
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/tickets/:id/comments"
+  headers:
+    - name: Content-Type
+      value: application/json
+  params:
+    - name: id
+      value: t1
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "authorId": "u2",
+        "message": "Estamos analisando o problema."
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: BASE_URL
+      value: http://localhost:3000
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

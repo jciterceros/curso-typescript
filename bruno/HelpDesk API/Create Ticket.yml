@@ -1,0 +1,33 @@
+info:
+  name: Create Ticket
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/tickets"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Erro no acesso ao sistema",
+        "description": "Usuario não consegue realizar login após atualização",
+        "status": "open",
+        "priority": 2,
+        "assigneeId": "u1"
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: BASE_URL
+      value: http://localhost:3000
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

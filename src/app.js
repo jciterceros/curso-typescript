@@ -1,7 +1,7 @@
-const express = require('express');
-const ticketsRoutes = require('./routes/tickets.routes');
-const usersRoutes = require('./routes/users.routes');
-const errorMiddleware = require('./middlewares/error.middleware');
+import express from 'express';
+import ticketsRoutes from './routes/tickets.routes.js';
+import usersRoutes from './routes/users.routes.js';
+import errorMiddleware from './middlewares/error.middleware.js';
 
 const app = express();
 
@@ -12,7 +12,8 @@ app.use('/users', usersRoutes);
 
 app.use(errorMiddleware);
 
-const PORT = 3000;
+const PORT = process.env.PORT ?? 3000;
+
 app.listen(PORT, () => {
-  console.log(`🚀 Helpdesk API (JS) running on http://localhost:${PORT}`);
+  console.log(`Helpdesk API (JS) running on http://localhost:${PORT}`);
 });

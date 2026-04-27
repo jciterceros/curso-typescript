@@ -1,0 +1,24 @@
+info:
+  name: Get Ticket By Id
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{BASE_URL}}/tickets/:id"
+  params:
+    - name: id
+      value: t1
+      type: path
+  auth: inherit
+
+runtime:
+  variables:
+    - name: BASE_URL
+      value: http://localhost:3000
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

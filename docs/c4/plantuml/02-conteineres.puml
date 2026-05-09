@@ -1,0 +1,16 @@
+@startuml conteineres
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(cliente, "Cliente API", "Consumidor HTTP")
+
+System_Boundary(apiBoundary, "Helpdesk API") {
+    Container(api, "Aplicação Express", "Node.js + Express", "Expõe endpoints e orquestra regras")
+    ContainerDb(mem, "Memória do processo", "Arrays em memória", "Armazena tickets, comments e users durante execução")
+}
+
+Rel(cliente, api, "Consome endpoints", "HTTP/JSON")
+Rel(api, mem, "Leitura e escrita")
+
+@enduml

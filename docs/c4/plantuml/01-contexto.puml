@@ -1,0 +1,14 @@
+@startuml contexto
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(cliente, "Cliente API", "Consumidor HTTP (Bruno, testes automatizados, frontend)")
+Person(instrutor, "Instrutor/Aluno", "Executa localmente para fins didáticos")
+
+System(helpdesk, "Helpdesk API", "API REST Node.js + Express para tickets de suporte")
+
+Rel(cliente, helpdesk, "Consome endpoints REST", "HTTP/JSON")
+Rel(instrutor, helpdesk, "Executa e valida contrato", "npm run dev / npm test")
+
+@enduml

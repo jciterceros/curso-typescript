@@ -1,0 +1,22 @@
+@startuml componentes
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+Container_Boundary(app, "Aplicação Express") {
+    Component(routes, "Routes", "Express Router", "Mapeia URL/Método para controller")
+    Component(controllers, "Controllers", "Camada HTTP", "Converte req/res em chamadas de serviço")
+    Component(services, "Services", "Regras de negócio", "Filtros, paginação, resumo, operações de ticket")
+    Component(repositories, "Repositories", "Acesso a dados", "Manipula arrays em memória")
+    Component(errorMw, "Error Middleware", "Middleware Express", "Padroniza erro 500 não tratado")
+    Component(idUtil, "ID Utility", "Função utilitária", "Gera IDs pseudoaleatórios")
+}
+
+Rel(routes, controllers, "Encaminha")
+Rel(controllers, services, "Invoca")
+Rel(controllers, repositories, "UsersController usa usersRepository diretamente")
+Rel(services, repositories, "Lê/escreve")
+Rel(repositories, idUtil, "Gera ID")
+Rel(controllers, errorMw, "Propaga erros não tratados")
+
+@enduml

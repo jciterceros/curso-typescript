@@ -1,0 +1,26 @@
+@startuml ciclo_requisicao
+skinparam backgroundColor #000000
+skinparam defaultFontColor #FFFFFF
+skinparam ArrowColor #FFFFFF
+skinparam activity {
+  BackgroundColor #000000
+  BorderColor #FFFFFF
+  FontColor #FFFFFF
+}
+
+start
+:Cliente HTTP;
+:Route;
+:Controller;
+:Service;
+:Repository;
+:Service;
+:Controller;
+:Resposta HTTP;
+if (Erro não tratado?) then (sim)
+  :Error Middleware;
+  :HTTP 500 JSON;
+endif
+stop
+
+@enduml

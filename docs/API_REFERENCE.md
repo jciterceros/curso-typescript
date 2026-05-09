@@ -288,11 +288,12 @@ curl http://localhost:3000/users
 
 ## 🔴 Tratamento de Erros
 
-Todos os erros seguem este formato:
+Erros de domínio e validação seguem este formato:
 
 **Exemplo (400 Bad Request):**
 ```json
 {
+  "code": "INVALID_REQUEST",
   "error": "Mensagem descritiva do erro"
 }
 ```
@@ -300,13 +301,17 @@ Todos os erros seguem este formato:
 **Exemplo (404 Not Found):**
 ```json
 {
+  "code": "TICKET_NOT_FOUND",
   "error": "Ticket not found"
 }
 ```
 
+Erros internos não mapeados (fallback) seguem este formato:
+
 **Exemplo (500 Internal Server Error):**
 ```json
 {
+  "code": "INTERNAL_SERVER_ERROR",
   "message": "Internal Server Error",
   "error": "Mensagem do erro interno"
 }

@@ -240,6 +240,28 @@ curl "http://localhost:3000/users"
 - 404: recurso nao encontrado.
 - 500: erro interno (middleware global).
 
+Formato de erro para falhas de dominio/validacao:
+
+```json
+{
+  "code": "INVALID_REQUEST",
+  "error": "Invalid request",
+  "details": {
+    "issues": []
+  }
+}
+```
+
+Formato de erro para falhas internas (fallback):
+
+```json
+{
+  "code": "INTERNAL_SERVER_ERROR",
+  "message": "Internal Server Error",
+  "error": "Mensagem do erro interno"
+}
+```
+
 ## Testes automatizados
 
 Para validar o contrato esperado da API:

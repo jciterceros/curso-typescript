@@ -46,12 +46,12 @@ export function resetTicketsRepository(): void {
 
 class TicketsRepository implements ITicketsRepository {
   findAll(): Ticket[] {
-    return tickets.map(cloneTicket);
+    return tickets;
   }
 
   findById(id: string): Ticket | null {
     const ticket = tickets.find((t) => t.id === id);
-    return ticket ? cloneTicket(ticket) : null;
+    return ticket ?? null;
   }
 
   create(data: CreateTicketDto): Ticket {

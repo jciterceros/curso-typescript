@@ -30,7 +30,7 @@ export function resetCommentsRepository(): void {
 
 class CommentsRepository implements ICommentsRepository {
   findByTicketId(ticketId: string): Comment[] {
-    return comments.filter((c) => c.ticketId === ticketId);
+    return comments.filter((c) => c.ticketId === ticketId).map(cloneComment);
   }
 
   create(data: CreateCommentDto): Comment {
@@ -40,7 +40,7 @@ class CommentsRepository implements ICommentsRepository {
       createdAt: new Date(),
     };
     comments.push(newComment);
-    return newComment;
+    return cloneComment(newComment);
   }
 }
 

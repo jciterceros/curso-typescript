@@ -13,12 +13,11 @@ const users: User[] = [
 
 class UsersRepository implements IUsersRepository {
   findAll(): User[] {
-    return users.map((u) => ({ ...u }));
+    return users;
   }
 
   findById(id: string): User | undefined {
-    const user = users.find((u) => u.id === id);
-    return user ? { ...user } : undefined;
+    return users.find((u) => u.id === id);
   }
 }
 

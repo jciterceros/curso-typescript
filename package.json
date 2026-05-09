@@ -2,12 +2,14 @@
   "name": "curso-typescript",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node dist/app.js",
-    "dev": "tsx watch src/app.ts",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "test": "vitest run --globals --pool=threads --fileParallelism=false"
+    "test": "vitest run",
+    "test:cov": "vitest run --coverage",
+    "test:cov:open": "npm run test:cov && start coverage\\index.html"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +20,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.5",
     "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
     "supertest": "^7.2.2",

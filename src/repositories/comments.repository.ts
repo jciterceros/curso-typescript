@@ -14,7 +14,7 @@ interface CreateCommentDto {
   message: string;
 }
 
-const comments: Comment[] = [
+const initialComments: Comment[] = [
   {
     id: "c1",
     ticketId: "t1",
@@ -23,6 +23,18 @@ const comments: Comment[] = [
     createdAt: new Date(),
   },
 ];
+
+const cloneComment = (comment: Comment): Comment => ({
+  ...comment,
+  createdAt: new Date(comment.createdAt),
+});
+
+const comments: Comment[] = initialComments.map(cloneComment);
+
+export function resetCommentsRepository(): void {
+  comments.length = 0;
+  comments.push(...initialComments.map(cloneComment));
+}
 
 class CommentsRepository {
   findByTicketId(ticketId: string): Comment[] {

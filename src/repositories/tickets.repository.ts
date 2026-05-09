@@ -1,7 +1,7 @@
 import { CreateTicketDto, Ticket, UpdateTicketDto } from '../domain/ticket.js';
 import { generateId } from '../utils/id.js';
 
-const tickets: Ticket[] = [
+const initialTickets: Ticket[] = [
   {
     id: 't1',
     title: 'Erro no login',
@@ -23,6 +23,19 @@ const tickets: Ticket[] = [
     updatedAt: new Date(),
   },
 ];
+
+const cloneTicket = (ticket: Ticket): Ticket => ({
+  ...ticket,
+  createdAt: new Date(ticket.createdAt),
+  updatedAt: new Date(ticket.updatedAt),
+});
+
+const tickets: Ticket[] = initialTickets.map(cloneTicket);
+
+export function resetTicketsRepository(): void {
+  tickets.length = 0;
+  tickets.push(...initialTickets.map(cloneTicket));
+}
 
 class TicketsRepository {
   findAll(): Ticket[] {

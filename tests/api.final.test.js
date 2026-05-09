@@ -1,50 +1,15 @@
 import request from 'supertest';
-import { spawn } from 'node:child_process';
-import { get } from 'node:http';
-
-let nextPort = 3100;
-
-function waitForServer(port) {
-  return new Promise((resolve, reject) => {
-    const deadline = Date.now() + 5000;
-
-    function tryRequest() {
-      const req = get(`http://127.0.0.1:${port}/users`, res => {
-        res.resume();
-        resolve();
-      });
-
-      req.on('error', error => {
-        if (Date.now() > deadline) {
-          reject(error);
-          return;
-        }
-
-        setTimeout(tryRequest, 50);
-      });
-    }
-
-    tryRequest();
-  });
-}
+import app from "../src/app.ts";
+import { resetCommentsRepository } from "../src/repositories/comments.repository.ts";
+import { resetTicketsRepository } from "../src/repositories/tickets.repository.ts";
 
 describe('Helpdesk API - contrato final da migracao', () => {
   let api;
-  let server;
 
-  beforeEach(async () => {
-    const port = nextPort++;
-    server = spawn(process.execPath, ["--import", "tsx", "src/app.ts"], {
-      env: { ...process.env, PORT: String(port) },
-      stdio: "ignore",
-    });
-    api = request(`http://127.0.0.1:${port}`);
-
-    await waitForServer(port);
-  });
-
-  afterEach(() => {
-    server.kill();
+  beforeEach(() => {
+    resetTicketsRepository();
+    resetCommentsRepository();
+    api = request(app);
   });
 
   it('lista tickets com contrato consistente e prioridades numericas', async () => {
@@ -87,11 +52,25 @@ describe('Helpdesk API - contrato final da migracao', () => {
     });
   });
 
+  it("filtra tickets por status valido", async () => {
+    const response = await api.get("/tickets").query({ status: "open" }).expect(200);
+
+    expect(response.body.data.length).toBeGreaterThan(0);
+
+    for (const ticket of response.body.data) {
+      expect(ticket.status).toBe("open");
+    }
+  });
+
   it('rejeita query params invalidos', async () => {
     await api
       .get('/tickets')
       .query({ status: 'closedd', priority: 'alta', limit: '0', page: '-1' })
       .expect(400);
+  });
+
+  it("rejeita query param de prioridade vazio", async () => {
+    await api.get("/tickets").query({ priority: "" }).expect(400);
   });
 
   it('retorna detalhes do ticket com comentarios e trata 404', async () => {

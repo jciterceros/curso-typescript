@@ -44,6 +44,17 @@ describe("Helpdesk API - contrato final da migracao", () => {
     }
   });
 
+  it("expoe rotas versionadas em /api/v1", async () => {
+    const response = await api.get("/api/v1/tickets").expect(200);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        data: expect.any(Array),
+        meta: expect.any(Object),
+      }),
+    );
+  });
+
   it("filtra tickets usando query params convertidos e validados", async () => {
     const response = await api
       .get("/tickets")
@@ -399,6 +410,28 @@ describe("Helpdesk API - contrato final da migracao", () => {
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
         message: "Invalid request",
+      }),
+    );
+  });
+
+  it("rejeita comentario com authorId inexistente", async () => {
+    const response = await api
+      .post("/tickets/t1/comments")
+      .send({
+        authorId: "u999",
+        message: "Mensagem valida",
+      })
+      .expect(400);
+
+    expect(response.body.error).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        message: "Invalid request",
+      }),
+    );
+    expect(response.body.error.details).toEqual(
+      expect.objectContaining({
+        authorId: "Author not found",
       }),
     );
   });

@@ -37,6 +37,17 @@ export class TicketsService {
     }
   }
 
+  private validateAuthorExists(authorId: string): void {
+    const user = this.deps.usersRepository.findById(authorId);
+    if (!user) {
+      throw new ValidationError(
+        ERROR_MESSAGES.INVALID_REQUEST,
+        { authorId: "Author not found" },
+        ERROR_CODES.INVALID_REQUEST,
+      );
+    }
+  }
+
   listTickets(filters: ListTicketsFilters) {
     const { status, priority, limit = 10, page = 1 } = filters;
     let tickets = this.deps.ticketsRepository.findAll();
@@ -104,6 +115,8 @@ export class TicketsService {
   addComment(ticketId: string, commentData: AddCommentInput) {
     const ticket = this.deps.ticketsRepository.findById(ticketId);
     if (!ticket) return null;
+
+    this.validateAuthorExists(commentData.authorId);
 
     return this.deps.commentsRepository.create({
       ticketId,

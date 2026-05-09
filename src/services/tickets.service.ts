@@ -26,7 +26,7 @@ type TicketsServiceDeps = {
 };
 
 class TicketsService {
-  constructor(private readonly deps: TicketsServiceDeps) { }
+  constructor(private readonly deps: TicketsServiceDeps) {}
 
   private validateAssigneeExists(assigneeId: string | undefined): void {
     if (!assigneeId) return;

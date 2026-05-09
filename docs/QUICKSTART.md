@@ -267,7 +267,7 @@ Dados enviados não correspondem ao schema. Verifique tipos e formatos.
 
 ```bash
 # Rodar em porta diferente
-PORT=3001 npm run dev
+PORT=3000 npm run dev
 ```
 
 ---

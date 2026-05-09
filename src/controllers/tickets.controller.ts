@@ -94,6 +94,9 @@ class TicketsController {
   addComment(req: Request<{ id: string }>, res: Response) {
     const commentData = parseOrThrow(addCommentSchema, req.body);
     const comment = ticketsService.addComment(req.params.id, commentData);
+    if (!comment) {
+      throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
+    }
     res.status(201).json(comment);
   }
 }

@@ -1,7 +1,10 @@
 import ticketsRepository from "../repositories/tickets.repository.js";
 import commentsRepository from "../repositories/comments.repository.js";
 import { CreateTicketDto, TicketStatus, UpdateTicketDto } from "../domain/ticket.js";
-import { NotFoundError } from "../errors/app-error.js";
+import type { CreateCommentDto } from "../domain/comment.js";
+import usersRepository from "../repositories/users.repository.js";
+import { ValidationError } from "../errors/app-error.js";
+import { ERROR_CODES } from "../constants/error-codes.js";
 import { ERROR_MESSAGES } from "../constants/error-messages.js";
 
 type ListTicketsFilters = {
@@ -11,12 +14,21 @@ type ListTicketsFilters = {
   page?: number;
 };
 
-type CreateCommentDto = {
-  authorId: string;
-  message: string;
-};
+type AddCommentInput = Omit<CreateCommentDto, "ticketId">;
 
 class TicketsService {
+  private validateAssigneeExists(assigneeId: string | undefined): void {
+    if (!assigneeId) return;
+    const user = usersRepository.findById(assigneeId);
+    if (!user) {
+      throw new ValidationError(
+        ERROR_MESSAGES.INVALID_REQUEST,
+        { assigneeId: "Assignee not found" },
+        ERROR_CODES.INVALID_REQUEST,
+      );
+    }
+  }
+
   listTickets(filters: ListTicketsFilters) {
     const { status, priority, limit = 10, page = 1 } = filters;
     let tickets = ticketsRepository.findAll();
@@ -31,10 +43,15 @@ class TicketsService {
 
     const start = (page - 1) * limit;
     const end = start + limit;
+    const total = tickets.length;
+    const totalPages = Math.ceil(total / limit);
 
     return {
       data: tickets.slice(start, end),
-      total: tickets.length,
+      total,
+      page,
+      limit,
+      totalPages,
     };
   }
 
@@ -56,28 +73,28 @@ class TicketsService {
 
     return {
       title: ticket.title,
-      short_desc: ticket.description,
-      assigned_to: ticket.assigneeId,
+      shortDesc: ticket.description,
+      assignedTo: ticket.assigneeId,
       created: ticket.createdAt.toISOString(),
     };
   }
 
   createTicket(ticketData: CreateTicketDto) {
+    this.validateAssigneeExists(ticketData.assigneeId);
     const ticket = ticketsRepository.create(ticketData);
 
     return { ticket };
   }
 
   updateTicket(id: string, updateData: UpdateTicketDto) {
+    this.validateAssigneeExists(updateData.assigneeId);
     const ticket = ticketsRepository.update(id, updateData);
     return ticket;
   }
 
-  addComment(ticketId: string, commentData: CreateCommentDto) {
+  addComment(ticketId: string, commentData: AddCommentInput) {
     const ticket = ticketsRepository.findById(ticketId);
-    if (!ticket) {
-      throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
-    }
+    if (!ticket) return null;
 
     return commentsRepository.create({
       ticketId,

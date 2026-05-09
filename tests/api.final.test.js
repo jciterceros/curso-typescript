@@ -34,9 +34,9 @@ describe('Helpdesk API - contrato final da migracao', () => {
 
   beforeEach(async () => {
     const port = nextPort++;
-    server = spawn(process.execPath, ['src/app.js'], {
+    server = spawn(process.execPath, ["--import", "tsx", "src/app.ts"], {
       env: { ...process.env, PORT: String(port) },
-      stdio: 'ignore',
+      stdio: "ignore",
     });
     api = request(`http://127.0.0.1:${port}`);
 
@@ -122,6 +122,10 @@ describe('Helpdesk API - contrato final da migracao', () => {
     expect(response.body.short_desc).toBeTruthy();
   });
 
+  it("retorna 404 ao buscar resumo de ticket inexistente", async () => {
+    await api.get("/tickets/ticket-inexistente/summary").expect(404);
+  });
+
   it('cria ticket valido e converte priority para number', async () => {
     const response = await api
       .post('/tickets')
@@ -142,6 +146,18 @@ describe('Helpdesk API - contrato final da migracao', () => {
         priority: 2,
         assigneeId: 'u1',
       }),
+    );
+
+    const listResponse = await api.get("/tickets").query({ limit: 50, page: 1 }).expect(200);
+
+    expect(listResponse.body.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: response.body.ticket.id,
+          title: "Erro no login",
+          priority: 2,
+        }),
+      ]),
     );
   });
 
@@ -191,30 +207,61 @@ describe('Helpdesk API - contrato final da migracao', () => {
       .expect(400);
   });
 
-  it('adiciona comentario em ticket existente e retorna 404 para ticket ausente', async () => {
+  it("rejeita PATCH com body vazio", async () => {
+    await api.patch("/tickets/t1").send({}).expect(400);
+  });
+
+  it("retorna 404 ao atualizar ticket inexistente", async () => {
+    await api.patch("/tickets/ticket-inexistente").send({ status: "closed" }).expect(404);
+  });
+
+  it("adiciona comentario em ticket existente e retorna 404 para ticket ausente", async () => {
     const response = await api
-      .post('/tickets/t1/comments')
+      .post("/tickets/t1/comments")
       .send({
-        authorId: 'u2',
-        message: 'Estamos analisando o problema.',
+        authorId: "u2",
+        message: "Estamos analisando o problema.",
       })
       .expect(201);
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        ticketId: 't1',
-        authorId: 'u2',
-        message: 'Estamos analisando o problema.',
+        ticketId: "t1",
+        authorId: "u2",
+        message: "Estamos analisando o problema.",
       }),
     );
 
     await api
-      .post('/tickets/ticket-inexistente/comments')
+      .post("/tickets/ticket-inexistente/comments")
       .send({
-        authorId: 'u2',
-        message: 'Nao deve ser criado.',
+        authorId: "u2",
+        message: "Nao deve ser criado.",
       })
       .expect(404);
+
+    const ticketResponse = await api.get("/tickets/t1").expect(200);
+
+    expect(ticketResponse.body.comments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: response.body.id,
+          ticketId: "t1",
+          authorId: "u2",
+          message: "Estamos analisando o problema.",
+        }),
+      ]),
+    );
+  });
+
+  it("rejeita comentario com payload invalido", async () => {
+    await api
+      .post("/tickets/t1/comments")
+      .send({
+        authorId: "",
+        message: "",
+      })
+      .expect(400);
   });
 
   it('lista usuarios cadastrados', async () => {

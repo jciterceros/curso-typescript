@@ -4,8 +4,9 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "node --watch src/app.js",
+    "start": "node dist/app.js",
+    "dev": "tsx watch src/app.ts",
+    "build": "tsc",
     "test": "vitest run --globals --pool=threads --fileParallelism=false"
   },
   "keywords": [],
@@ -17,7 +18,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
     "supertest": "^7.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.5"
   }
 }

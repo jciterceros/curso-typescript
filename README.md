@@ -1,12 +1,48 @@
-# Helpdesk API
+# Helpdesk API - TypeScript
 
-API REST simples desenvolvida em Node.js e Express para gerenciamento de tickets de suporte tecnico. A aplicacao usa persistencia em memoria, entao os dados voltam ao estado inicial sempre que o servidor e reiniciado.
+API REST para gerenciamento de tickets de suporte tecnico, desenvolvida com Node.js, Express e TypeScript.
+A aplicacao usa validacao de entrada com Zod e persistencia em memoria.
+
+## Visao Geral
+
+- Arquitetura em camadas (controllers, services, repositories, domain).
+- Projeto 100% tipado com TypeScript.
+- Validacao rigorosa de query/body com Zod.
+- Testes automatizados de contrato HTTP com Vitest + Supertest.
+
+## Stack
+
+| Aspecto | Tecnologia |
+| --- | --- |
+| Runtime | Node.js 24.x |
+| Framework | Express 5.x |
+| Linguagem | TypeScript 6.x |
+| Validacao | Zod |
+| Testes | Vitest + Supertest |
+| Dev Server | tsx watch |
+| Modulos | ESM |
+
+## Estrutura
+
+```text
+src/
+  app.ts
+  controllers/
+  services/
+  repositories/
+  routes/
+  middlewares/
+  domain/
+  utils/
+tests/
+docs/
+```
 
 ## Como rodar
 
 ### Usando os atalhos do projeto
 
-Use os atalhos da raiz do projeto:
+Use os atalhos da raiz:
 
 ```bat
 iniciar-dev.bat
@@ -26,13 +62,43 @@ npm install
 npm run dev
 ```
 
-A API fica disponivel em:
+API local em:
 
 ```text
 http://localhost:3000
 ```
 
+### Build e producao
+
+```bash
+npm run build
+npm start
+```
+
+### Testes
+
+```bash
+npm test
+```
+
 ## Endpoints
+
+### Tickets
+
+| Metodo | Endpoint | Descricao |
+| --- | --- | --- |
+| GET | /tickets | Lista tickets com filtros e paginacao |
+| POST | /tickets | Cria ticket |
+| GET | /tickets/:id | Obtem ticket com comentarios |
+| GET | /tickets/:id/summary | Obtem resumo do ticket |
+| PATCH | /tickets/:id | Atualiza ticket parcialmente |
+| POST | /tickets/:id/comments | Adiciona comentario |
+
+### Usuarios
+
+| Metodo | Endpoint | Descricao |
+| --- | --- | --- |
+| GET | /users | Lista usuarios |
 
 Base URL local:
 
@@ -48,10 +114,10 @@ Query params opcionais:
 
 | Parametro | Tipo | Descricao |
 | --- | --- | --- |
-| `status` | string | Filtra por status exato, por exemplo `open` ou `in_progress`. |
-| `priority` | number/string | Filtra por prioridade. A API compara com igualdade flexivel. |
-| `limit` | number | Quantidade de tickets por pagina. Padrao: `10`. |
-| `page` | number | Pagina desejada. Padrao: `1`. |
+| status | string | Filtra por status exato, por exemplo open ou in_progress. |
+| priority | number/string | Filtra por prioridade. |
+| limit | number | Quantidade de tickets por pagina. Padrao: 10. |
+| page | number | Pagina desejada. Padrao: 1. |
 
 Exemplo:
 
@@ -59,35 +125,9 @@ Exemplo:
 curl "http://localhost:3000/tickets?limit=5&page=1&status=open"
 ```
 
-Resposta:
-
-```json
-{
-  "data": [
-    {
-      "id": "t1",
-      "title": "Erro no login",
-      "description": "Nao consigo acessar o sistema com minha senha.",
-      "status": "open",
-      "priority": 5,
-      "assigneeId": "u1",
-      "createdAt": "2026-04-27T00:00:00.000Z",
-      "updatedAt": "2026-04-27T00:00:00.000Z"
-    }
-  ],
-  "total": 1
-}
-```
-
 ### GET /tickets/:id
 
-Busca um ticket por ID e inclui os comentarios relacionados.
-
-Path params:
-
-| Parametro | Tipo | Descricao |
-| --- | --- | --- |
-| `id` | string | ID do ticket, por exemplo `t1`. |
+Busca um ticket por ID e inclui comentarios relacionados.
 
 Exemplo:
 
@@ -95,47 +135,9 @@ Exemplo:
 curl "http://localhost:3000/tickets/t1"
 ```
 
-Resposta `200`:
-
-```json
-{
-  "id": "t1",
-  "title": "Erro no login",
-  "description": "Nao consigo acessar o sistema com minha senha.",
-  "status": "open",
-  "priority": 5,
-  "assigneeId": "u1",
-  "createdAt": "2026-04-27T00:00:00.000Z",
-  "updatedAt": "2026-04-27T00:00:00.000Z",
-  "comments": [
-    {
-      "id": "c1",
-      "ticketId": "t1",
-      "authorId": "u2",
-      "message": "Ja estamos verificando o servidor de autenticacao.",
-      "createdAt": "2026-04-27T00:00:00.000Z"
-    }
-  ]
-}
-```
-
-Resposta `404`:
-
-```json
-{
-  "error": "Ticket not found"
-}
-```
-
 ### GET /tickets/:id/summary
 
 Retorna um resumo do ticket.
-
-Path params:
-
-| Parametro | Tipo | Descricao |
-| --- | --- | --- |
-| `id` | string | ID do ticket, por exemplo `t1`. |
 
 Exemplo:
 
@@ -143,39 +145,26 @@ Exemplo:
 curl "http://localhost:3000/tickets/t1/summary"
 ```
 
-Resposta `200`:
+Resposta contem os campos:
 
-```json
-{
-  "title": "Erro no login",
-  "assigned_to": "u1",
-  "created": "27/04/2026"
-}
-```
-
-Observacao: o campo `short_desc` existe no codigo, mas hoje sai como `undefined`, porque o service usa `ticket.desc` enquanto os tickets possuem `description`.
-
-Resposta `404`:
-
-```json
-{
-  "error": "Ticket not found"
-}
-```
+- title
+- short_desc
+- assigned_to
+- created
 
 ### POST /tickets
 
 Cria um ticket.
 
-Body JSON:
+Body JSON esperado:
 
 | Campo | Tipo | Obrigatorio | Descricao |
 | --- | --- | --- | --- |
-| `title` | string | Recomendado | Titulo do ticket. |
-| `description` | string | Recomendado | Descricao do problema. |
-| `status` | string | Recomendado | Status inicial, por exemplo `open`. |
-| `priority` | number/string | Recomendado | Prioridade do ticket. |
-| `assigneeId` | string | Recomendado | ID do usuario responsavel. |
+| title | string | Sim | Titulo do ticket. |
+| description | string | Sim | Descricao do problema. |
+| status | string | Sim | Status inicial. |
+| priority | number/string | Sim | Prioridade de 1 a 5. |
+| assigneeId | string | Nao | ID do usuario responsavel. |
 
 Exemplo:
 
@@ -184,43 +173,16 @@ curl -X POST "http://localhost:3000/tickets" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Erro no acesso ao sistema",
-    "description": "Usuario nao consegue realizar login apos atualizacao",
+    "description": "Usuario nao consegue realizar login",
     "status": "open",
     "priority": 2,
     "assigneeId": "u1"
   }'
 ```
 
-Resposta `201`:
-
-```json
-{
-  "ticket": {
-    "id": "abc123",
-    "title": "Erro no acesso ao sistema",
-    "description": "Usuario nao consegue realizar login apos atualizacao",
-    "status": "open",
-    "priority": 2,
-    "assigneeId": "u1",
-    "createdAt": "2026-04-27T00:00:00.000Z",
-    "updatedAt": "2026-04-27T00:00:00.000Z"
-  }
-}
-```
-
 ### PATCH /tickets/:id
 
 Atualiza parcialmente um ticket existente.
-
-Path params:
-
-| Parametro | Tipo | Descricao |
-| --- | --- | --- |
-| `id` | string | ID do ticket, por exemplo `t1`. |
-
-Body JSON:
-
-Envie apenas os campos que deseja alterar, por exemplo `title`, `description`, `status`, `priority` ou `assigneeId`.
 
 Exemplo:
 
@@ -232,45 +194,16 @@ curl -X PATCH "http://localhost:3000/tickets/t1" \
   }'
 ```
 
-Resposta `200`:
-
-```json
-{
-  "id": "t1",
-  "title": "Erro no login",
-  "description": "Nao consigo acessar o sistema com minha senha.",
-  "status": "in_progress",
-  "priority": 5,
-  "assigneeId": "u1",
-  "createdAt": "2026-04-27T00:00:00.000Z",
-  "updatedAt": "2026-04-27T00:00:00.000Z"
-}
-```
-
-Resposta `404`:
-
-```json
-{
-  "error": "Ticket not found"
-}
-```
-
 ### POST /tickets/:id/comments
 
 Adiciona um comentario a um ticket.
 
-Path params:
-
-| Parametro | Tipo | Descricao |
-| --- | --- | --- |
-| `id` | string | ID do ticket, por exemplo `t1`. |
-
-Body JSON:
+Body JSON esperado:
 
 | Campo | Tipo | Obrigatorio | Descricao |
 | --- | --- | --- | --- |
-| `authorId` | string | Recomendado | ID do usuario que comentou. |
-| `message` | string | Recomendado | Texto do comentario. |
+| authorId | string | Sim | ID do usuario que comentou. |
+| message | string | Sim | Texto do comentario. |
 
 Exemplo:
 
@@ -283,26 +216,6 @@ curl -X POST "http://localhost:3000/tickets/t1/comments" \
   }'
 ```
 
-Resposta `201`:
-
-```json
-{
-  "id": "abc123",
-  "ticketId": "t1",
-  "authorId": "u2",
-  "message": "Estamos analisando o problema.",
-  "createdAt": "2026-04-27T00:00:00.000Z"
-}
-```
-
-Resposta `404`:
-
-```json
-{
-  "error": "Ticket not found"
-}
-```
-
 ### GET /users
 
 Lista usuarios cadastrados.
@@ -313,36 +226,47 @@ Exemplo:
 curl "http://localhost:3000/users"
 ```
 
-Resposta `200`:
+## Regras de validacao
 
-```json
-[
-  {
-    "id": "u1",
-    "name": "Alice Suporte",
-    "email": "alice@helpdesk.com"
-  },
-  {
-    "id": "u2",
-    "name": "Bob Tecnico",
-    "email": "bob@helpdesk.com"
-  },
-  {
-    "id": "u3",
-    "name": "Charlie Usuario",
-    "email": "charlie@gmail.com"
-  }
-]
-```
+- status: open, closed, in_progress.
+- priority: inteiro entre 1 e 5.
+- limit e page: inteiros maiores que 0.
+- PATCH /tickets/:id exige ao menos 1 campo valido.
+- Comentarios exigem authorId e message.
+
+## Erros HTTP
+
+- 400: entrada invalida (query/body fora do schema).
+- 404: recurso nao encontrado.
+- 500: erro interno (middleware global).
 
 ## Testes automatizados
 
-Para validar o contrato final esperado depois da migracao para TypeScript, rode:
+Para validar o contrato esperado da API:
 
-```bat
+```bash
 npm test
 ```
 
-A suite usa Vitest e Supertest para testar a API Express sem precisar iniciar o servidor em `localhost:3000`.
+A suite cobre os cenarios principais de fluxo:
 
-Esses testes substituem os scripts manuais antigos da pasta `scripts/`. Eles verificam os principais criterios do roteiro de migracao: payload valido e invalido, filtros por query params, conversao de `priority`, tratamento de `404`, resumo do ticket, `PATCH` com campos permitidos e comentarios.
+- payload valido e invalido
+- filtros por query params
+- conversao de priority
+- tratamento de 404
+- resumo do ticket
+- PATCH com campos permitidos
+- comentarios
+
+## Documentacao complementar
+
+
+**Quer entender o projeto?** Leia [README](./README.md)
+
+**Quer entender todos endpoints?** Veja [API Reference](./API_REFERENCE.md)
+
+**Quer ver o modelo?** Confira [C4](./c4/README.md)
+
+**Quer entender os fluxos?** Veja [Fluxos](./fluxos/README.md)
+
+**Quer entender as decisoes de arquitetura?** Veja [ADR](./adr/README.md)

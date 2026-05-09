@@ -1,38 +1,43 @@
+import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
-
-const morganMock = vi.fn(() => (_req: unknown, _res: unknown, next: () => void) => next());
-
-async function loadAppWithEnv(nodeEnv: string | undefined) {
-  const previousNodeEnv = process.env.NODE_ENV;
-
-  if (nodeEnv === undefined) {
-    delete process.env.NODE_ENV;
-  } else {
-    process.env.NODE_ENV = nodeEnv;
-  }
-
-  vi.resetModules();
-  vi.doMock("morgan", () => ({ default: morganMock }));
-
-  await import("../src/app.js");
-
-  process.env.NODE_ENV = previousNodeEnv;
-}
+import app from "../src/app.js";
+import logger from "../src/utils/logger.js";
 
 describe("app logging configuration", () => {
-  it("uses tiny format in test environment", async () => {
-    morganMock.mockClear();
+  it("propagates incoming request id to response header", async () => {
+    const response = await request(app).get("/users").set("x-request-id", "req-123").expect(200);
 
-    await loadAppWithEnv("test");
-
-    expect(morganMock).toHaveBeenCalledWith("tiny");
+    expect(response.headers["x-request-id"]).toBe("req-123");
   });
 
-  it("uses combined format outside test environment", async () => {
-    morganMock.mockClear();
+  it("logs structured JSON and redacts sensitive fields", async () => {
+    const loggerInfo = vi.spyOn(logger, "info").mockImplementation(() => logger as never);
 
-    await loadAppWithEnv("development");
+    await request(app)
+      .post("/tickets")
+      .send({
+        title: "ab",
+        description: "x",
+        status: "open",
+        priority: 1,
+        password: "super-secret",
+      })
+      .expect(400);
 
-    expect(morganMock).toHaveBeenCalledWith("combined");
+    expect(loggerInfo).toHaveBeenCalled();
+    const lastCall = loggerInfo.mock.calls.at(-1);
+    expect(lastCall).toBeDefined();
+
+    const logEntry = (lastCall?.[0] ?? {}) as {
+      event: string;
+      requestId: string;
+      body: { password?: string };
+      statusCode: number;
+    };
+
+    expect(logEntry.event).toBe("http_request");
+    expect(logEntry.requestId).toEqual(expect.any(String));
+    expect(logEntry.statusCode).toBe(400);
+    expect(logEntry.body.password).toBe("[REDACTED]");
   });
 });

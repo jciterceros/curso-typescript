@@ -3,6 +3,7 @@ import { AppError } from "../errors/app-error.js";
 import { ERROR_CODES } from "../constants/error-codes.js";
 import { ERROR_MESSAGES } from "../constants/error-messages.js";
 import logger from "../utils/logger.js";
+import { env } from "../config/env.js";
 
 const errorMiddleware: ErrorRequestHandler = (err, req, res, _next) => {
   if (err instanceof AppError) {
@@ -15,7 +16,7 @@ const errorMiddleware: ErrorRequestHandler = (err, req, res, _next) => {
     });
   }
 
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = env.NODE_ENV === "production";
   const internalErrorMessage = err instanceof Error ? err.message : String(err);
   const errorEvent = "http_error";
 

@@ -4,6 +4,14 @@ import { ValidationError } from "../src/errors/app-error.js";
 import { ERROR_CODES } from "../src/constants/error-codes.js";
 import logger from "../src/utils/logger.js";
 
+const mockEnv = vi.hoisted(() => ({
+  NODE_ENV: "test" as "development" | "production" | "test",
+  PORT: 3000,
+  LOG_LEVEL: "info" as "debug" | "info" | "warn" | "error",
+}));
+
+vi.mock("../src/config/env.js", () => ({ env: mockEnv }));
+
 describe("error middleware", () => {
   it("retorna 500 com payload padrao para Error", () => {
     const json = vi.fn();
@@ -65,8 +73,7 @@ describe("error middleware", () => {
   });
 
   it("nao expõe detalhes internos no payload 500 em producao", () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    mockEnv.NODE_ENV = "production";
 
     const json = vi.fn();
     const res = {
@@ -90,7 +97,7 @@ describe("error middleware", () => {
     });
 
     loggerError.mockRestore();
-    process.env.NODE_ENV = originalEnv;
+    mockEnv.NODE_ENV = "test";
   });
 
   it("mapeia ValidationError para 400 sem cair no fallback 500", () => {

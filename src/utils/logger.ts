@@ -1,9 +1,10 @@
 import pino from "pino";
+import { env } from "../config/env.js";
 
-const defaultLogLevel = process.env.NODE_ENV === "production" ? "info" : "debug";
+const defaultLogLevel = env.NODE_ENV === "production" ? "info" : "debug";
 
 const logger = pino({
-  level: process.env.LOG_LEVEL ?? defaultLogLevel,
+  level: env.LOG_LEVEL ?? defaultLogLevel,
   timestamp: pino.stdTimeFunctions.isoTime,
 });
 

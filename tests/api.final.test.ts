@@ -1,11 +1,12 @@
 import request from "supertest";
-import app from "../src/app.ts";
-import { resetCommentsRepository } from "../src/repositories/comments.repository.ts";
-import { resetTicketsRepository } from "../src/repositories/tickets.repository.ts";
-import { ERROR_CODES } from "../src/constants/error-codes.ts";
+import { beforeEach, describe, expect, it } from "vitest";
+import app from "../src/app.js";
+import { resetCommentsRepository } from "../src/repositories/comments.repository.js";
+import { resetTicketsRepository } from "../src/repositories/tickets.repository.js";
+import { ERROR_CODES } from "../src/constants/error-codes.js";
 
 describe("Helpdesk API - contrato final da migracao", () => {
-  let api;
+  let api: ReturnType<typeof request>;
 
   beforeEach(() => {
     resetTicketsRepository();

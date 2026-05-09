@@ -1,6 +1,7 @@
-import errorMiddleware from "../src/middlewares/error.middleware.ts";
-import { ValidationError } from "../src/errors/app-error.ts";
-import { ERROR_CODES } from "../src/constants/error-codes.ts";
+import { describe, expect, it, vi } from "vitest";
+import errorMiddleware from "../src/middlewares/error.middleware.js";
+import { ValidationError } from "../src/errors/app-error.js";
+import { ERROR_CODES } from "../src/constants/error-codes.js";
 
 describe("error middleware", () => {
   it("retorna 500 com payload padrao para Error", () => {
@@ -10,7 +11,7 @@ describe("error middleware", () => {
     };
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    errorMiddleware(new Error("falha inesperada"), {}, res, vi.fn());
+    errorMiddleware(new Error("falha inesperada"), {} as never, res as never, vi.fn());
 
     expect(consoleError).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(500);
@@ -30,7 +31,7 @@ describe("error middleware", () => {
     };
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    errorMiddleware("falha crua", {}, res, vi.fn());
+    errorMiddleware("falha crua", {} as never, res as never, vi.fn());
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(json).toHaveBeenCalledWith({
@@ -52,7 +53,7 @@ describe("error middleware", () => {
     const error = new ValidationError("Invalid request", {
       fieldErrors: { status: ["Invalid enum value"] },
     });
-    errorMiddleware(error, {}, res, vi.fn());
+    errorMiddleware(error, {} as never, res as never, vi.fn());
 
     expect(consoleError).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);

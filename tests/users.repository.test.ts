@@ -1,4 +1,5 @@
-import usersRepository from "../src/repositories/users.repository.ts";
+import { describe, expect, it } from "vitest";
+import usersRepository from "../src/repositories/users.repository.js";
 
 describe("users repository", () => {
   it("retorna usuario por id existente", () => {

@@ -1,0 +1,13 @@
+services:
+  api:
+    container_name: helpdesk-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${HOST_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      LOG_LEVEL: info
+    restart: unless-stopped

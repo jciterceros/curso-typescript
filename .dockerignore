@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+dist
+coverage
+.git
+.github
+.vscode
+.husky
+bruno
+docs
+docs-professor
+tools
+*.md
+*.bat

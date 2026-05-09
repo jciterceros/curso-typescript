@@ -75,6 +75,32 @@ npm run build
 npm start
 ```
 
+### Rodando com Docker
+
+Build da imagem:
+
+```bash
+docker build -t helpdesk-api .
+```
+
+Executando container:
+
+```bash
+docker run --rm -p 3000:3000 --name helpdesk-api helpdesk-api
+```
+
+Rodando com Docker Compose:
+
+```bash
+docker compose up --build -d
+```
+
+Parar os containers do compose:
+
+```bash
+docker compose down
+```
+
 ### Testes
 
 ```bash

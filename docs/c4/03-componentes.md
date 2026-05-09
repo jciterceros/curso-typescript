@@ -40,7 +40,6 @@ Explicar a decomposição interna da Aplicação Express e como as responsabilid
 ## Relações internas
 - `routes` → `controllers`
 - `controllers` → `services`
-- `controllers` → `repositories` (caso direto em `users`)
 - `services` → `repositories`
 - `repositories` → `id utility`
 - fluxo excepcional → `error middleware`

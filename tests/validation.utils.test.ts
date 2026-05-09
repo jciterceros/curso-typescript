@@ -27,4 +27,22 @@ describe("numberFromInputSchema", () => {
 
     expect(() => schema.parse("")).toThrow(ZodError);
   });
+
+  it("rejects boolean input", () => {
+    const schema = numberFromInputSchema(1, 5);
+
+    expect(() => schema.parse(true)).toThrow(ZodError);
+  });
+
+  it("rejects object input", () => {
+    const schema = numberFromInputSchema(1, 5);
+
+    expect(() => schema.parse({ value: 3 })).toThrow(ZodError);
+  });
+
+  it("rejects array input", () => {
+    const schema = numberFromInputSchema(1, 5);
+
+    expect(() => schema.parse(["3"])).toThrow(ZodError);
+  });
 });

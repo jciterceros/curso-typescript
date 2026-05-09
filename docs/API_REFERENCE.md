@@ -47,7 +47,12 @@ curl "http://localhost:3000/tickets?status=open&priority=1&limit=5&page=1"
       "updatedAt": "2026-05-08T10:00:00.000Z"
     }
   ],
-  "total": 1
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1
+  }
 }
 ```
 
@@ -91,7 +96,7 @@ curl -X POST http://localhost:3000/tickets \
 
 ```json
 {
-  "ticket": {
+  "data": {
     "id": "t3",
     "title": "Falha na impressora",
     "description": "Impressora não conecta à rede",
@@ -128,23 +133,25 @@ curl http://localhost:3000/tickets/t1
 
 ```json
 {
-  "id": "t1",
-  "title": "Erro no login",
-  "description": "Não consigo acessar o sistema",
-  "status": "open",
-  "priority": 5,
-  "assigneeId": "u1",
-  "createdAt": "2026-05-08T10:00:00.000Z",
-  "updatedAt": "2026-05-08T10:00:00.000Z",
-  "comments": [
-    {
-      "id": "c1",
-      "ticketId": "t1",
-      "authorId": "u1",
-      "message": "Tentei resetar a senha",
-      "createdAt": "2026-05-08T10:15:00.000Z"
-    }
-  ]
+  "data": {
+    "id": "t1",
+    "title": "Erro no login",
+    "description": "Não consigo acessar o sistema",
+    "status": "open",
+    "priority": 5,
+    "assigneeId": "u1",
+    "createdAt": "2026-05-08T10:00:00.000Z",
+    "updatedAt": "2026-05-08T10:00:00.000Z",
+    "comments": [
+      {
+        "id": "c1",
+        "ticketId": "t1",
+        "authorId": "u1",
+        "message": "Tentei resetar a senha",
+        "createdAt": "2026-05-08T10:15:00.000Z"
+      }
+    ]
+  }
 }
 ```
 
@@ -172,10 +179,12 @@ curl http://localhost:3000/tickets/t1/summary
 
 ```json
 {
-  "title": "Erro no login",
-  "shortDesc": "Não consigo acessar o sistema",
-  "assignedTo": "u1",
-  "created": "5/8/2026"
+  "data": {
+    "title": "Erro no login",
+    "shortDesc": "Não consigo acessar o sistema",
+    "assignedTo": "u1",
+    "created": "2026-05-08T10:00:00.000Z"
+  }
 }
 ```
 
@@ -220,14 +229,16 @@ curl -X PATCH http://localhost:3000/tickets/t1 \
 
 ```json
 {
-  "id": "t1",
-  "title": "Erro no login",
-  "description": "Não consigo acessar o sistema",
-  "status": "closed",
-  "priority": 1,
-  "assigneeId": "u1",
-  "createdAt": "2026-05-08T10:00:00.000Z",
-  "updatedAt": "2026-05-08T11:00:00.000Z"
+  "data": {
+    "id": "t1",
+    "title": "Erro no login",
+    "description": "Não consigo acessar o sistema",
+    "status": "closed",
+    "priority": 1,
+    "assigneeId": "u1",
+    "createdAt": "2026-05-08T10:00:00.000Z",
+    "updatedAt": "2026-05-08T11:00:00.000Z"
+  }
 }
 ```
 
@@ -270,11 +281,13 @@ curl -X POST http://localhost:3000/tickets/t1/comments \
 
 ```json
 {
-  "id": "c2",
-  "ticketId": "t1",
-  "authorId": "u2",
-  "message": "Consegui resolver o problema",
-  "createdAt": "2026-05-08T11:30:00.000Z"
+  "data": {
+    "id": "c2",
+    "ticketId": "t1",
+    "authorId": "u2",
+    "message": "Consegui resolver o problema",
+    "createdAt": "2026-05-08T11:30:00.000Z"
+  }
 }
 ```
 
@@ -300,37 +313,54 @@ curl http://localhost:3000/users
 **Exemplo de Resposta (200 OK):**
 
 ```json
-[
-  {
-    "id": "u1",
-    "name": "Alice Suporte",
-    "email": "alice@helpdesk.com"
-  },
-  {
-    "id": "u2",
-    "name": "Bob Tecnico",
-    "email": "bob@helpdesk.com"
-  },
-  {
-    "id": "u3",
-    "name": "Charlie Usuario",
-    "email": "charlie@gmail.com"
-  }
-]
+{
+  "data": [
+    {
+      "id": "u1",
+      "name": "Alice Suporte",
+      "email": "alice@helpdesk.com"
+    },
+    {
+      "id": "u2",
+      "name": "Bob Tecnico",
+      "email": "bob@helpdesk.com"
+    },
+    {
+      "id": "u3",
+      "name": "Charlie Usuario",
+      "email": "charlie@gmail.com"
+    }
+  ]
+}
 ```
 
 ---
 
 ## 🔴 Tratamento de Erros
 
-Erros de domínio e validação seguem este formato:
+Todos os erros seguem envelope padronizado:
+
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Mensagem descritiva",
+    "details": {}
+  }
+}
+```
 
 **Exemplo (400 Bad Request):**
 
 ```json
 {
-  "code": "INVALID_REQUEST",
-  "error": "Mensagem descritiva do erro"
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "Invalid request",
+    "details": {
+      "issues": []
+    }
+  }
 }
 ```
 
@@ -338,20 +368,24 @@ Erros de domínio e validação seguem este formato:
 
 ```json
 {
-  "code": "TICKET_NOT_FOUND",
-  "error": "Ticket not found"
+  "error": {
+    "code": "TICKET_NOT_FOUND",
+    "message": "Ticket not found"
+  }
 }
 ```
-
-Erros internos não mapeados (fallback) seguem este formato:
 
 **Exemplo (500 Internal Server Error):**
 
 ```json
 {
-  "code": "INTERNAL_SERVER_ERROR",
-  "message": "Internal Server Error",
-  "error": "Mensagem do erro interno"
+  "error": {
+    "code": "INTERNAL_SERVER_ERROR",
+    "message": "Internal Server Error",
+    "details": {
+      "internalMessage": "Mensagem do erro interno"
+    }
+  }
 }
 ```
 

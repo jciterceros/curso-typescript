@@ -1,9 +1,10 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import ticketsService from "../services/tickets.service.js";
+import { ticketsService } from "../bootstrap/services.js";
 import { NotFoundError, ValidationError } from "../errors/app-error.js";
 import { ERROR_MESSAGES } from "../constants/error-messages.js";
 import { numberFromInputSchema } from "../utils/validation.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
 const statusSchema = z.enum(["open", "closed", "in_progress"]);
 
@@ -39,6 +40,14 @@ const addCommentSchema = z.object({
   message: z.string().min(1),
 });
 
+const routeIdSchema = z.object({
+  id: z
+    .string()
+    .trim()
+    .min(1)
+    .regex(/^(t\d+|[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i),
+});
+
 const parseOrThrow = <T>(schema: z.ZodType<T>, input: unknown): T => {
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
@@ -55,44 +64,57 @@ class TicketsController {
   }
 
   show(req: Request<{ id: string }>, res: Response) {
-    const ticket = ticketsService.getTicketById(req.params.id);
+    const { id } = parseOrThrow(routeIdSchema, req.params);
+    const ticket = ticketsService.getTicketById(id);
     if (!ticket) {
       throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
     }
-    res.json(ticket);
+    res.json({ data: ticket });
   }
 
   summary(req: Request<{ id: string }>, res: Response) {
-    const summary = ticketsService.getTicketSummary(req.params.id);
+    const { id } = parseOrThrow(routeIdSchema, req.params);
+    const summary = ticketsService.getTicketSummary(id);
     if (!summary) {
       throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
     }
-    res.json(summary);
+    res.json({ data: summary });
   }
 
   store(req: Request, res: Response) {
     const ticketData = parseOrThrow(createTicketSchema, req.body);
     const result = ticketsService.createTicket(ticketData);
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   }
 
   update(req: Request<{ id: string }>, res: Response) {
+    const { id } = parseOrThrow(routeIdSchema, req.params);
     const updateData = parseOrThrow(updateTicketSchema, req.body);
-    const ticket = ticketsService.updateTicket(req.params.id, updateData);
+    const ticket = ticketsService.updateTicket(id, updateData);
     if (!ticket) {
       throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
     }
-    res.json(ticket);
+    res.json({ data: ticket });
   }
 
   addComment(req: Request<{ id: string }>, res: Response) {
+    const { id } = parseOrThrow(routeIdSchema, req.params);
     const commentData = parseOrThrow(addCommentSchema, req.body);
-    const comment = ticketsService.addComment(req.params.id, commentData);
+    const comment = ticketsService.addComment(id, commentData);
     if (!comment) {
       throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
     }
-    res.status(201).json(comment);
+    res.status(201).json({ data: comment });
   }
 }
 
-export default new TicketsController();
+const ticketsController = new TicketsController();
+
+export default {
+  index: asyncHandler(ticketsController.index.bind(ticketsController)),
+  show: asyncHandler(ticketsController.show.bind(ticketsController)),
+  summary: asyncHandler(ticketsController.summary.bind(ticketsController)),
+  store: asyncHandler(ticketsController.store.bind(ticketsController)),
+  update: asyncHandler(ticketsController.update.bind(ticketsController)),
+  addComment: asyncHandler(ticketsController.addComment.bind(ticketsController)),
+};

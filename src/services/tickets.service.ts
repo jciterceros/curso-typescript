@@ -1,8 +1,5 @@
-import ticketsRepository from "../repositories/tickets.repository.js";
-import commentsRepository from "../repositories/comments.repository.js";
 import { CreateTicketDto, TicketStatus, UpdateTicketDto } from "../domain/ticket.js";
 import type { CreateCommentDto } from "../domain/comment.js";
-import usersRepository from "../repositories/users.repository.js";
 import type { ITicketsRepository } from "../repositories/tickets.repository.js";
 import type { ICommentsRepository } from "../repositories/comments.repository.js";
 import type { IUsersRepository } from "../repositories/users.repository.js";
@@ -19,13 +16,13 @@ type ListTicketsFilters = {
 
 type AddCommentInput = Omit<CreateCommentDto, "ticketId">;
 
-type TicketsServiceDeps = {
+export type TicketsServiceDeps = {
   ticketsRepository: ITicketsRepository;
   commentsRepository: ICommentsRepository;
   usersRepository: IUsersRepository;
 };
 
-class TicketsService {
+export class TicketsService {
   constructor(private readonly deps: TicketsServiceDeps) {}
 
   private validateAssigneeExists(assigneeId: string | undefined): void {
@@ -59,10 +56,12 @@ class TicketsService {
 
     return {
       data: tickets.slice(start, end),
-      total,
-      page,
-      limit,
-      totalPages,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
     };
   }
 
@@ -93,8 +92,7 @@ class TicketsService {
   createTicket(ticketData: CreateTicketDto) {
     this.validateAssigneeExists(ticketData.assigneeId);
     const ticket = this.deps.ticketsRepository.create(ticketData);
-
-    return { ticket };
+    return ticket;
   }
 
   updateTicket(id: string, updateData: UpdateTicketDto) {
@@ -113,9 +111,3 @@ class TicketsService {
     });
   }
 }
-
-export default new TicketsService({
-  ticketsRepository,
-  commentsRepository,
-  usersRepository,
-});

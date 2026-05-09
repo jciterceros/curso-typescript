@@ -6,6 +6,7 @@ import { resetTicketsRepository } from "../src/repositories/tickets.repository.j
 import { ERROR_CODES } from "../src/constants/error-codes.js";
 
 describe("Helpdesk API - contrato final da migracao", () => {
+  const nonExistentTicketId = "00000000-0000-4000-8000-000000000000";
   let api: ReturnType<typeof request>;
 
   beforeEach(() => {
@@ -19,10 +20,12 @@ describe("Helpdesk API - contrato final da migracao", () => {
 
     expect(response.body).toEqual({
       data: expect.any(Array),
-      total: expect.any(Number),
-      page: 1,
-      limit: 10,
-      totalPages: expect.any(Number),
+      meta: {
+        total: expect.any(Number),
+        page: 1,
+        limit: 10,
+        totalPages: expect.any(Number),
+      },
     });
 
     expect(response.body.data.length).toBeGreaterThan(0);
@@ -70,10 +73,10 @@ describe("Helpdesk API - contrato final da migracao", () => {
       .query({ status: "closedd", priority: "alta", limit: "0", page: "-1" })
       .expect(400);
 
-    expect(response.body).toEqual(
+    expect(response.body.error).toEqual(
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
-        error: "Invalid request",
+        message: "Invalid request",
       }),
     );
   });
@@ -81,18 +84,41 @@ describe("Helpdesk API - contrato final da migracao", () => {
   it("rejeita query param de prioridade vazio", async () => {
     const response = await api.get("/tickets").query({ priority: "" }).expect(400);
 
-    expect(response.body).toEqual(
+    expect(response.body.error).toEqual(
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
-        error: "Invalid request",
+        message: "Invalid request",
       }),
     );
+  });
+
+  it("rejeita parametros de rota id invalidos", async () => {
+    const invalidId = encodeURIComponent("   ");
+
+    const responses = await Promise.all([
+      api.get(`/tickets/${invalidId}`).expect(400),
+      api.get(`/tickets/${invalidId}/summary`).expect(400),
+      api.patch(`/tickets/${invalidId}`).send({ status: "closed" }).expect(400),
+      api
+        .post(`/tickets/${invalidId}/comments`)
+        .send({ authorId: "u2", message: "teste" })
+        .expect(400),
+    ]);
+
+    for (const response of responses) {
+      expect(response.body.error).toEqual(
+        expect.objectContaining({
+          code: ERROR_CODES.INVALID_REQUEST,
+          message: "Invalid request",
+        }),
+      );
+    }
   });
 
   it("retorna detalhes do ticket com comentarios e trata 404", async () => {
     const response = await api.get("/tickets/t1").expect(200);
 
-    expect(response.body).toEqual(
+    expect(response.body.data).toEqual(
       expect.objectContaining({
         id: "t1",
         description: expect.any(String),
@@ -100,17 +126,19 @@ describe("Helpdesk API - contrato final da migracao", () => {
       }),
     );
 
-    const notFoundResponse = await api.get("/tickets/ticket-inexistente").expect(404);
+    const notFoundResponse = await api.get(`/tickets/${nonExistentTicketId}`).expect(404);
     expect(notFoundResponse.body).toEqual({
-      code: ERROR_CODES.TICKET_NOT_FOUND,
-      error: "Ticket not found",
+      error: {
+        code: ERROR_CODES.TICKET_NOT_FOUND,
+        message: "Ticket not found",
+      },
     });
   });
 
   it("retorna resumo usando description em vez de uma propriedade inexistente", async () => {
     const response = await api.get("/tickets/t1/summary").expect(200);
 
-    expect(response.body).toEqual(
+    expect(response.body.data).toEqual(
       expect.objectContaining({
         title: "Erro no login",
         shortDesc: expect.any(String),
@@ -118,15 +146,17 @@ describe("Helpdesk API - contrato final da migracao", () => {
         created: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
       }),
     );
-    expect(response.body.shortDesc).toBeTruthy();
+    expect(response.body.data.shortDesc).toBeTruthy();
   });
 
   it("retorna 404 ao buscar resumo de ticket inexistente", async () => {
-    const response = await api.get("/tickets/ticket-inexistente/summary").expect(404);
+    const response = await api.get(`/tickets/${nonExistentTicketId}/summary`).expect(404);
 
     expect(response.body).toEqual({
-      code: ERROR_CODES.TICKET_NOT_FOUND,
-      error: "Ticket not found",
+      error: {
+        code: ERROR_CODES.TICKET_NOT_FOUND,
+        message: "Ticket not found",
+      },
     });
   });
 
@@ -142,7 +172,7 @@ describe("Helpdesk API - contrato final da migracao", () => {
       })
       .expect(201);
 
-    expect(response.body.ticket).toEqual(
+    expect(response.body.data).toEqual(
       expect.objectContaining({
         title: "Erro no login",
         description: "Usuario nao consegue acessar o sistema",
@@ -157,7 +187,7 @@ describe("Helpdesk API - contrato final da migracao", () => {
     expect(listResponse.body.data).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: response.body.ticket.id,
+          id: response.body.data.id,
           title: "Erro no login",
           priority: 2,
         }),
@@ -176,10 +206,29 @@ describe("Helpdesk API - contrato final da migracao", () => {
       })
       .expect(400);
 
-    expect(response.body).toEqual(
+    expect(response.body.error).toEqual(
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
-        error: "Invalid request",
+        message: "Invalid request",
+      }),
+    );
+  });
+
+  it("rejeita criacao com priority booleana", async () => {
+    const response = await api
+      .post("/tickets")
+      .send({
+        title: "Erro no login",
+        description: "Usuario nao consegue acessar o sistema",
+        status: "open",
+        priority: true,
+      })
+      .expect(400);
+
+    expect(response.body.error).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        message: "Invalid request",
       }),
     );
   });
@@ -196,13 +245,13 @@ describe("Helpdesk API - contrato final da migracao", () => {
       })
       .expect(400);
 
-    expect(response.body).toEqual(
+    expect(response.body.error).toEqual(
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
-        error: "Invalid request",
+        message: "Invalid request",
       }),
     );
-    expect(response.body.details).toEqual(
+    expect(response.body.error.details).toEqual(
       expect.objectContaining({
         assigneeId: "Assignee not found",
       }),
@@ -222,15 +271,15 @@ describe("Helpdesk API - contrato final da migracao", () => {
       })
       .expect(200);
 
-    expect(response.body).toEqual(
+    expect(response.body.data).toEqual(
       expect.objectContaining({
         id: "t1",
         status: "closed",
         priority: 4,
       }),
     );
-    expect(response.body.createdAt).toBe(before.body.createdAt);
-    expect(response.body).not.toHaveProperty("extra_field");
+    expect(response.body.data.createdAt).toBe(before.body.data.createdAt);
+    expect(response.body.data).not.toHaveProperty("extra_field");
   });
 
   it("rejeita PATCH com campos invalidos", async () => {
@@ -242,10 +291,10 @@ describe("Helpdesk API - contrato final da migracao", () => {
       })
       .expect(400);
 
-    expect(response.body).toEqual(
+    expect(response.body.error).toEqual(
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
-        error: "Invalid request",
+        message: "Invalid request",
       }),
     );
   });
@@ -253,10 +302,10 @@ describe("Helpdesk API - contrato final da migracao", () => {
   it("rejeita PATCH com body vazio", async () => {
     const response = await api.patch("/tickets/t1").send({}).expect(400);
 
-    expect(response.body).toEqual(
+    expect(response.body.error).toEqual(
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
-        error: "Invalid request",
+        message: "Invalid request",
       }),
     );
   });
@@ -264,13 +313,13 @@ describe("Helpdesk API - contrato final da migracao", () => {
   it("rejeita PATCH com assigneeId inexistente", async () => {
     const response = await api.patch("/tickets/t1").send({ assigneeId: "u999" }).expect(400);
 
-    expect(response.body).toEqual(
+    expect(response.body.error).toEqual(
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
-        error: "Invalid request",
+        message: "Invalid request",
       }),
     );
-    expect(response.body.details).toEqual(
+    expect(response.body.error.details).toEqual(
       expect.objectContaining({
         assigneeId: "Assignee not found",
       }),
@@ -279,13 +328,15 @@ describe("Helpdesk API - contrato final da migracao", () => {
 
   it("retorna 404 ao atualizar ticket inexistente", async () => {
     const response = await api
-      .patch("/tickets/ticket-inexistente")
+      .patch(`/tickets/${nonExistentTicketId}`)
       .send({ status: "closed" })
       .expect(404);
 
     expect(response.body).toEqual({
-      code: ERROR_CODES.TICKET_NOT_FOUND,
-      error: "Ticket not found",
+      error: {
+        code: ERROR_CODES.TICKET_NOT_FOUND,
+        message: "Ticket not found",
+      },
     });
   });
 
@@ -298,7 +349,7 @@ describe("Helpdesk API - contrato final da migracao", () => {
       })
       .expect(201);
 
-    expect(response.body).toEqual(
+    expect(response.body.data).toEqual(
       expect.objectContaining({
         ticketId: "t1",
         authorId: "u2",
@@ -307,7 +358,7 @@ describe("Helpdesk API - contrato final da migracao", () => {
     );
 
     const notFoundResponse = await api
-      .post("/tickets/ticket-inexistente/comments")
+      .post(`/tickets/${nonExistentTicketId}/comments`)
       .send({
         authorId: "u2",
         message: "Nao deve ser criado.",
@@ -315,16 +366,18 @@ describe("Helpdesk API - contrato final da migracao", () => {
       .expect(404);
 
     expect(notFoundResponse.body).toEqual({
-      code: ERROR_CODES.TICKET_NOT_FOUND,
-      error: "Ticket not found",
+      error: {
+        code: ERROR_CODES.TICKET_NOT_FOUND,
+        message: "Ticket not found",
+      },
     });
 
     const ticketResponse = await api.get("/tickets/t1").expect(200);
 
-    expect(ticketResponse.body.comments).toEqual(
+    expect(ticketResponse.body.data.comments).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: response.body.id,
+          id: response.body.data.id,
           ticketId: "t1",
           authorId: "u2",
           message: "Estamos analisando o problema.",
@@ -342,10 +395,10 @@ describe("Helpdesk API - contrato final da migracao", () => {
       })
       .expect(400);
 
-    expect(response.body).toEqual(
+    expect(response.body.error).toEqual(
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
-        error: "Invalid request",
+        message: "Invalid request",
       }),
     );
   });
@@ -353,7 +406,7 @@ describe("Helpdesk API - contrato final da migracao", () => {
   it("lista usuarios cadastrados", async () => {
     const response = await api.get("/users").expect(200);
 
-    expect(response.body).toEqual(
+    expect(response.body.data).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: "u1",

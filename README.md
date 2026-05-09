@@ -148,8 +148,8 @@ curl "http://localhost:3000/tickets/t1/summary"
 Resposta contem os campos:
 
 - title
-- short_desc
-- assigned_to
+- shortDesc
+- assignedTo
 - created
 
 ### POST /tickets
@@ -244,10 +244,12 @@ Formato de erro para falhas de dominio/validacao:
 
 ```json
 {
-  "code": "INVALID_REQUEST",
-  "error": "Invalid request",
-  "details": {
-    "issues": []
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "Invalid request",
+    "details": {
+      "issues": []
+    }
   }
 }
 ```
@@ -256,9 +258,13 @@ Formato de erro para falhas internas (fallback):
 
 ```json
 {
-  "code": "INTERNAL_SERVER_ERROR",
-  "message": "Internal Server Error",
-  "error": "Mensagem do erro interno"
+  "error": {
+    "code": "INTERNAL_SERVER_ERROR",
+    "message": "Internal Server Error",
+    "details": {
+      "internalMessage": "Mensagem do erro interno"
+    }
+  }
 }
 ```
 

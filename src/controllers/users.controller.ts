@@ -1,11 +1,16 @@
 import type { Request, Response } from "express";
-import usersService from "../services/users.service.js";
+import { usersService } from "../bootstrap/services.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
 class UsersController {
   index(_req: Request, res: Response) {
     const users = usersService.findAll();
-    res.json(users);
+    res.json({ data: users });
   }
 }
 
-export default new UsersController();
+const usersController = new UsersController();
+
+export default {
+  index: asyncHandler(usersController.index.bind(usersController)),
+};

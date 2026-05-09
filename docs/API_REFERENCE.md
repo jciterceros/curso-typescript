@@ -173,8 +173,8 @@ curl http://localhost:3000/tickets/t1/summary
 ```json
 {
   "title": "Erro no login",
-  "short_desc": "Não consigo acessar o sistema",
-  "assigned_to": "u1",
+  "shortDesc": "Não consigo acessar o sistema",
+  "assignedTo": "u1",
   "created": "5/8/2026"
 }
 ```

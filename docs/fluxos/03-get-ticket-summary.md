@@ -21,7 +21,7 @@ sequenceDiagram
 
     alt Ticket existe
         T-->>S: ticket
-        S-->>C: { title, short_desc, assigned_to, created }
+        S-->>C: { title, shortDesc, assignedTo, created }
         C-->>Cliente: 200 JSON
     else Ticket não existe
         T-->>S: null
@@ -32,4 +32,4 @@ sequenceDiagram
 
 ## Observação
 
-No estado atual, `short_desc` referencia `ticket.description`.
+No estado atual, `shortDesc` referencia `ticket.description`.

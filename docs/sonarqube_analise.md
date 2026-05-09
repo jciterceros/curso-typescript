@@ -8,14 +8,14 @@
 
 ## 🎯 Resumo Executivo
 
-| Métrica                  | Status   | Observação                               |
-| ------------------------ | -------- | ---------------------------------------- |
-| **Erros de Tipagem**     | ✅ 0     | Strict mode habilitado                   |
-| **Segurança**            | ✅ Bom  | Validações completas, sem vulnerabilidades |
-| **Duplicação de Código** | ✅ Baixa | Clonagem removida (exceto comments)      |
-| **Complexidade**         | ✅ Baixa | Métodos bem delimitados                  |
-| **Cobertura de Testes**  | ✅ Alta  | 44/44 testes passando                    |
-| **Observabilidade**      | ✅ Excelente | Logger estruturado com Pino            |
+| Métrica                  | Status       | Observação                                 |
+| ------------------------ | ------------ | ------------------------------------------ |
+| **Erros de Tipagem**     | ✅ 0         | Strict mode habilitado                     |
+| **Segurança**            | ✅ Bom       | Validações completas, sem vulnerabilidades |
+| **Duplicação de Código** | ✅ Baixa     | Clonagem removida (exceto comments)        |
+| **Complexidade**         | ✅ Baixa     | Métodos bem delimitados                    |
+| **Cobertura de Testes**  | ✅ Alta      | 44/44 testes passando                      |
+| **Observabilidade**      | ✅ Excelente | Logger estruturado com Pino                |
 
 ---
 
@@ -48,6 +48,7 @@ export default {
 ```
 
 **Status**: ✅ Implementado em `src/utils/async-handler.ts`
+
 - Todos os controllers têm error handling automático
 - Testes confirmam captura de erros síncronos e assincronos
 - Arquivo: [tests/async-handler.test.ts](tests/async-handler.test.ts#L1)
@@ -86,6 +87,7 @@ findByTicketId(ticketId: string): Comment[] {
 ```
 
 **Status**: ✅ Implementado
+
 - Tickets: sem clonagem (reads performáticas)
 - Users: sem clonagem (reads performáticas)
 - Comments: clonagem defensiva mantida (teste contrato)
@@ -125,6 +127,7 @@ Todos os endpoints agora retornam envelope padronizado:
 ```
 
 **Status**: ✅ Implementado e testado
+
 - Contrato padronizado em [src/controllers/tickets.controller.ts](src/controllers/tickets.controller.ts#L60)
 - Validação em [tests/api.final.test.ts](tests/api.final.test.ts#L20)
 - Documentação em [docs/API_REFERENCE.md](docs/API_REFERENCE.md#L47)
@@ -157,6 +160,7 @@ show(req: Request, res: Response) {
 ```
 
 **Status**: ✅ Implementado
+
 - Aceita: `t1`, `t123`, UUIDs válidos
 - Rejeita: espaços, strings aleatórias, IDs inválidos (400)
 - Endpoints cobertos: GET /:id, GET /:id/summary, PATCH /:id, POST /:id/comments
@@ -192,11 +196,13 @@ logger.error({ event: "http_error", errorCode, requestId, err }, "http_error");
 ```
 
 **Logs estruturados**:
+
 - ✅ HTTP requests: `{ event: "http_request", requestId, method, path, statusCode, durationMs, redactedBody }`
 - ✅ Unhandled errors: `{ event: "http_error", errorCode, requestId, method, path, internalMessage }`
 - ✅ Sensibilidade: redaction automática de password/token/authorization
 
 **Status**: ✅ Implementado
+
 - Logger centralizado: [src/utils/logger.ts](src/utils/logger.ts)
 - Middleware de requisição: [src/middlewares/request-logger.middleware.ts](src/middlewares/request-logger.middleware.ts#L52)
 - Middleware de erro: [src/middlewares/error.middleware.ts](src/middlewares/error.middleware.ts#L20)
@@ -421,18 +427,18 @@ CRITICIDADE:
 
 ## 📈 Métricas de Qualidade
 
-| Métrica                    | Antes | Depois  | Meta   | Status |
-| -------------------------- | ----- | ------- | ------ | ------ |
-| TypeScript Coverage        | 100%  | 100%    | 100%   | ✅     |
-| Test Pass Rate             | 11/11 | 44/44   | 100%   | ✅     |
-| Linting Issues             | 0     | 0       | 0      | ✅     |
-| Type Errors                | 0     | 0       | 0      | ✅     |
-| Critical Issues Resolved   | 0     | 5/5     | -      | ✅     |
-| Code Duplication           | 15%   | ~8%     | <10%   | ✅     |
-| Cyclomatic Complexity      | Baixa | Baixa   | Baixa  | ✅     |
-| Logger Centralization      | Não   | Sim     | Sim    | ✅     |
-| Route Param Validation     | Não   | Sim     | Sim    | ✅     |
-| API Contract Consistency   | Não   | Sim     | Sim    | ✅     |
+| Métrica                  | Antes | Depois | Meta  | Status |
+| ------------------------ | ----- | ------ | ----- | ------ |
+| TypeScript Coverage      | 100%  | 100%   | 100%  | ✅     |
+| Test Pass Rate           | 11/11 | 44/44  | 100%  | ✅     |
+| Linting Issues           | 0     | 0      | 0     | ✅     |
+| Type Errors              | 0     | 0      | 0     | ✅     |
+| Critical Issues Resolved | 0     | 5/5    | -     | ✅     |
+| Code Duplication         | 15%   | ~8%    | <10%  | ✅     |
+| Cyclomatic Complexity    | Baixa | Baixa  | Baixa | ✅     |
+| Logger Centralization    | Não   | Sim    | Sim   | ✅     |
+| Route Param Validation   | Não   | Sim    | Sim   | ✅     |
+| API Contract Consistency | Não   | Sim    | Sim   | ✅     |
 
 ---
 
@@ -454,6 +460,7 @@ CRITICIDADE:
 ### Implementações Completadas
 
 ✅ **Sprint 1 - Crítico (100%)**
+
 - Async/Await error handling robusto
 - Performance otimizada (90% redução clonagem)
 - API contrato consistente e documentado

@@ -1,8 +1,4 @@
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+import type { User } from "../domain/user.js";
 
 const users: User[] = [
   { id: "u1", name: "Alice Suporte", email: "alice@helpdesk.com" },

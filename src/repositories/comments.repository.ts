@@ -1,18 +1,5 @@
 import { generateId } from "../utils/id.js";
-
-interface Comment {
-  id: string;
-  ticketId: string;
-  authorId: string;
-  message: string;
-  createdAt: Date;
-}
-
-interface CreateCommentDto {
-  ticketId: string;
-  authorId: string;
-  message: string;
-}
+import type { Comment, CreateCommentDto } from "../domain/comment.js";
 
 const initialComments: Comment[] = [
   {

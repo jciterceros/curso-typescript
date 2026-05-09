@@ -12,8 +12,4 @@ app.use('/users', usersRoutes);
 
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT ?? 3000;
-
-app.listen(PORT, () => {
-  console.log(`Helpdesk API (TypeScript) running on http://localhost:${PORT}`);
-});
+export default app;

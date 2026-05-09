@@ -3,7 +3,7 @@ import { AppError } from "../errors/app-error.js";
 import { ERROR_CODES } from "../constants/error-codes.js";
 import { ERROR_MESSAGES } from "../constants/error-messages.js";
 
-const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
+const errorMiddleware: ErrorRequestHandler = (err, req, res, _next) => {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       code: err.code,

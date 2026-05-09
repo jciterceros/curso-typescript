@@ -10,7 +10,6 @@ Para facilitar a leitura, o modelo C4 foi dividido em arquivos por nível, com d
 4. [Nível 4 - Código](./04-codigo.md)
 5. [Ciclo de requisição (resumo)](./05-ciclo-requisicao.md)
 
-
 ## Diagramas visuais (PlantUML)
 
 Use os diagramas C4 em PlantUML na pasta [plantuml/README.md](./plantuml/README.md).

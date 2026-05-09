@@ -1,8 +1,8 @@
-import ticketsRepository from '../repositories/tickets.repository.js';
-import commentsRepository from '../repositories/comments.repository.js';
-import { CreateTicketDto, TicketStatus, UpdateTicketDto } from '../domain/ticket.js';
-import { NotFoundError } from '../errors/app-error.js';
-import { ERROR_MESSAGES } from '../constants/error-messages.js';
+import ticketsRepository from "../repositories/tickets.repository.js";
+import commentsRepository from "../repositories/comments.repository.js";
+import { CreateTicketDto, TicketStatus, UpdateTicketDto } from "../domain/ticket.js";
+import { NotFoundError } from "../errors/app-error.js";
+import { ERROR_MESSAGES } from "../constants/error-messages.js";
 
 type ListTicketsFilters = {
   status?: TicketStatus;
@@ -22,19 +22,19 @@ class TicketsService {
     let tickets = ticketsRepository.findAll();
 
     if (status) {
-      tickets = tickets.filter(t => t.status === status);
+      tickets = tickets.filter((t) => t.status === status);
     }
 
     if (priority !== undefined) {
-      tickets = tickets.filter(t => t.priority === priority);
+      tickets = tickets.filter((t) => t.priority === priority);
     }
 
     const start = (page - 1) * limit;
     const end = start + limit;
-    
+
     return {
       data: tickets.slice(start, end),
-      total: tickets.length
+      total: tickets.length,
     };
   }
 
@@ -43,10 +43,10 @@ class TicketsService {
     if (!ticket) return null;
 
     const comments = commentsRepository.findByTicketId(id);
-    
+
     return {
       ...ticket,
-      comments
+      comments,
     };
   }
 
@@ -58,13 +58,13 @@ class TicketsService {
       title: ticket.title,
       short_desc: ticket.description,
       assigned_to: ticket.assigneeId,
-      created: ticket.createdAt.toISOString()
+      created: ticket.createdAt.toISOString(),
     };
   }
 
   createTicket(ticketData: CreateTicketDto) {
     const ticket = ticketsRepository.create(ticketData);
-    
+
     return { ticket };
   }
 
@@ -81,7 +81,7 @@ class TicketsService {
 
     return commentsRepository.create({
       ticketId,
-      ...commentData
+      ...commentData,
     });
   }
 }

@@ -13,9 +13,11 @@ http://localhost:3000
 ## 📋 Tickets
 
 ### GET /tickets
+
 **Listagem de tickets com filtros e paginação**
 
 **Query Parameters:**
+
 ```
 status?: 'open' | 'closed' | 'in_progress'
 priority?: 1 | 2 | 3 | 4 | 5
@@ -24,11 +26,13 @@ page?: number (default: 1, min: 1)
 ```
 
 **Exemplo de Requisição:**
+
 ```bash
 curl "http://localhost:3000/tickets?status=open&priority=1&limit=5&page=1"
 ```
 
 **Exemplo de Resposta (200 OK):**
+
 ```json
 {
   "data": [
@@ -48,14 +52,17 @@ curl "http://localhost:3000/tickets?status=open&priority=1&limit=5&page=1"
 ```
 
 **Erros:**
+
 - `400 Bad Request` - Query parameters inválidos
 
 ---
 
 ### POST /tickets
+
 **Criar novo ticket**
 
 **Request Body:**
+
 ```json
 {
   "title": "string (min 3 chars)",
@@ -67,6 +74,7 @@ curl "http://localhost:3000/tickets?status=open&priority=1&limit=5&page=1"
 ```
 
 **Exemplo de Requisição:**
+
 ```bash
 curl -X POST http://localhost:3000/tickets \
   -H "Content-Type: application/json" \
@@ -80,6 +88,7 @@ curl -X POST http://localhost:3000/tickets \
 ```
 
 **Exemplo de Resposta (201 Created):**
+
 ```json
 {
   "ticket": {
@@ -96,22 +105,27 @@ curl -X POST http://localhost:3000/tickets \
 ```
 
 **Erros:**
+
 - `400 Bad Request` - Body inválido ou campos faltando
 
 ---
 
 ### GET /tickets/:id
+
 **Obter ticket detalhado com comentários**
 
 **Path Parameters:**
+
 - `id` (string) - ID do ticket
 
 **Exemplo de Requisição:**
+
 ```bash
 curl http://localhost:3000/tickets/t1
 ```
 
 **Exemplo de Resposta (200 OK):**
+
 ```json
 {
   "id": "t1",
@@ -135,22 +149,27 @@ curl http://localhost:3000/tickets/t1
 ```
 
 **Erros:**
+
 - `404 Not Found` - Ticket não existe
 
 ---
 
 ### GET /tickets/:id/summary
+
 **Obter resumo simplificado do ticket**
 
 **Path Parameters:**
+
 - `id` (string) - ID do ticket
 
 **Exemplo de Requisição:**
+
 ```bash
 curl http://localhost:3000/tickets/t1/summary
 ```
 
 **Exemplo de Resposta (200 OK):**
+
 ```json
 {
   "title": "Erro no login",
@@ -161,17 +180,21 @@ curl http://localhost:3000/tickets/t1/summary
 ```
 
 **Erros:**
+
 - `404 Not Found` - Ticket não existe
 
 ---
 
 ### PATCH /tickets/:id
+
 **Atualizar ticket (campos parciais)**
 
 **Path Parameters:**
+
 - `id` (string) - ID do ticket
 
 **Request Body (todos os campos opcionais, mas min. 1 obrigatório):**
+
 ```json
 {
   "title": "string (min 3 chars, optional)",
@@ -183,6 +206,7 @@ curl http://localhost:3000/tickets/t1/summary
 ```
 
 **Exemplo de Requisição:**
+
 ```bash
 curl -X PATCH http://localhost:3000/tickets/t1 \
   -H "Content-Type: application/json" \
@@ -193,6 +217,7 @@ curl -X PATCH http://localhost:3000/tickets/t1 \
 ```
 
 **Exemplo de Resposta (200 OK):**
+
 ```json
 {
   "id": "t1",
@@ -207,18 +232,22 @@ curl -X PATCH http://localhost:3000/tickets/t1 \
 ```
 
 **Erros:**
+
 - `400 Bad Request` - Body vazio ou inválido
 - `404 Not Found` - Ticket não existe
 
 ---
 
 ### POST /tickets/:id/comments
+
 **Adicionar comentário ao ticket**
 
 **Path Parameters:**
+
 - `id` (string) - ID do ticket
 
 **Request Body:**
+
 ```json
 {
   "authorId": "string (required, min 1 char)",
@@ -227,6 +256,7 @@ curl -X PATCH http://localhost:3000/tickets/t1 \
 ```
 
 **Exemplo de Requisição:**
+
 ```bash
 curl -X POST http://localhost:3000/tickets/t1/comments \
   -H "Content-Type: application/json" \
@@ -237,6 +267,7 @@ curl -X POST http://localhost:3000/tickets/t1/comments \
 ```
 
 **Exemplo de Resposta (201 Created):**
+
 ```json
 {
   "id": "c2",
@@ -248,6 +279,7 @@ curl -X POST http://localhost:3000/tickets/t1/comments \
 ```
 
 **Erros:**
+
 - `400 Bad Request` - Body inválido ou campos faltando
 - `404 Not Found` - Ticket não existe
 
@@ -256,14 +288,17 @@ curl -X POST http://localhost:3000/tickets/t1/comments \
 ## 👥 Usuários
 
 ### GET /users
+
 **Listar todos os usuários**
 
 **Exemplo de Requisição:**
+
 ```bash
 curl http://localhost:3000/users
 ```
 
 **Exemplo de Resposta (200 OK):**
+
 ```json
 [
   {
@@ -291,6 +326,7 @@ curl http://localhost:3000/users
 Erros de domínio e validação seguem este formato:
 
 **Exemplo (400 Bad Request):**
+
 ```json
 {
   "code": "INVALID_REQUEST",
@@ -299,6 +335,7 @@ Erros de domínio e validação seguem este formato:
 ```
 
 **Exemplo (404 Not Found):**
+
 ```json
 {
   "code": "TICKET_NOT_FOUND",
@@ -309,6 +346,7 @@ Erros de domínio e validação seguem este formato:
 Erros internos não mapeados (fallback) seguem este formato:
 
 **Exemplo (500 Internal Server Error):**
+
 ```json
 {
   "code": "INTERNAL_SERVER_ERROR",
@@ -319,13 +357,13 @@ Erros internos não mapeados (fallback) seguem este formato:
 
 ### Códigos de Status HTTP
 
-| Status | Significado |
-|--------|-----------|
-| `200` | OK - Requisição bem-sucedida |
-| `201` | Created - Recurso criado com sucesso |
-| `400` | Bad Request - Dados inválidos |
-| `404` | Not Found - Recurso não encontrado |
-| `500` | Internal Server Error - Erro no servidor |
+| Status | Significado                              |
+| ------ | ---------------------------------------- |
+| `200`  | OK - Requisição bem-sucedida             |
+| `201`  | Created - Recurso criado com sucesso     |
+| `400`  | Bad Request - Dados inválidos            |
+| `404`  | Not Found - Recurso não encontrado       |
+| `500`  | Internal Server Error - Erro no servidor |
 
 ---
 
@@ -375,10 +413,12 @@ curl http://localhost:3000/users
 A aplicação inicia com dados pré-carregados:
 
 **Tickets:**
+
 - `t1`: "Erro no login" (open, priority 5) - Alice
 - `t2`: "Impressora offline" (in_progress, priority 3) - Bob
 
 **Usuários:**
+
 - `u1`: Alice Suporte (alice@helpdesk.com)
 - `u2`: Bob Tecnico (bob@helpdesk.com)
 - `u3`: Charlie Usuario (charlie@gmail.com)

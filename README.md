@@ -12,15 +12,15 @@ A aplicacao usa validacao de entrada com Zod e persistencia em memoria.
 
 ## Stack
 
-| Aspecto | Tecnologia |
-| --- | --- |
-| Runtime | Node.js 24.x |
-| Framework | Express 5.x |
-| Linguagem | TypeScript 6.x |
-| Validacao | Zod |
-| Testes | Vitest + Supertest |
-| Dev Server | tsx watch |
-| Modulos | ESM |
+| Aspecto    | Tecnologia         |
+| ---------- | ------------------ |
+| Runtime    | Node.js 24.x       |
+| Framework  | Express 5.x        |
+| Linguagem  | TypeScript 6.x     |
+| Validacao  | Zod                |
+| Testes     | Vitest + Supertest |
+| Dev Server | tsx watch          |
+| Modulos    | ESM                |
 
 ## Estrutura
 
@@ -85,20 +85,20 @@ npm test
 
 ### Tickets
 
-| Metodo | Endpoint | Descricao |
-| --- | --- | --- |
-| GET | /tickets | Lista tickets com filtros e paginacao |
-| POST | /tickets | Cria ticket |
-| GET | /tickets/:id | Obtem ticket com comentarios |
-| GET | /tickets/:id/summary | Obtem resumo do ticket |
-| PATCH | /tickets/:id | Atualiza ticket parcialmente |
-| POST | /tickets/:id/comments | Adiciona comentario |
+| Metodo | Endpoint              | Descricao                             |
+| ------ | --------------------- | ------------------------------------- |
+| GET    | /tickets              | Lista tickets com filtros e paginacao |
+| POST   | /tickets              | Cria ticket                           |
+| GET    | /tickets/:id          | Obtem ticket com comentarios          |
+| GET    | /tickets/:id/summary  | Obtem resumo do ticket                |
+| PATCH  | /tickets/:id          | Atualiza ticket parcialmente          |
+| POST   | /tickets/:id/comments | Adiciona comentario                   |
 
 ### Usuarios
 
-| Metodo | Endpoint | Descricao |
-| --- | --- | --- |
-| GET | /users | Lista usuarios |
+| Metodo | Endpoint | Descricao      |
+| ------ | -------- | -------------- |
+| GET    | /users   | Lista usuarios |
 
 Base URL local:
 
@@ -112,12 +112,12 @@ Lista tickets cadastrados.
 
 Query params opcionais:
 
-| Parametro | Tipo | Descricao |
-| --- | --- | --- |
-| status | string | Filtra por status exato, por exemplo open ou in_progress. |
-| priority | number/string | Filtra por prioridade. |
-| limit | number | Quantidade de tickets por pagina. Padrao: 10. |
-| page | number | Pagina desejada. Padrao: 1. |
+| Parametro | Tipo          | Descricao                                                 |
+| --------- | ------------- | --------------------------------------------------------- |
+| status    | string        | Filtra por status exato, por exemplo open ou in_progress. |
+| priority  | number/string | Filtra por prioridade.                                    |
+| limit     | number        | Quantidade de tickets por pagina. Padrao: 10.             |
+| page      | number        | Pagina desejada. Padrao: 1.                               |
 
 Exemplo:
 
@@ -158,13 +158,13 @@ Cria um ticket.
 
 Body JSON esperado:
 
-| Campo | Tipo | Obrigatorio | Descricao |
-| --- | --- | --- | --- |
-| title | string | Sim | Titulo do ticket. |
-| description | string | Sim | Descricao do problema. |
-| status | string | Sim | Status inicial. |
-| priority | number/string | Sim | Prioridade de 1 a 5. |
-| assigneeId | string | Nao | ID do usuario responsavel. |
+| Campo       | Tipo          | Obrigatorio | Descricao                  |
+| ----------- | ------------- | ----------- | -------------------------- |
+| title       | string        | Sim         | Titulo do ticket.          |
+| description | string        | Sim         | Descricao do problema.     |
+| status      | string        | Sim         | Status inicial.            |
+| priority    | number/string | Sim         | Prioridade de 1 a 5.       |
+| assigneeId  | string        | Nao         | ID do usuario responsavel. |
 
 Exemplo:
 
@@ -200,10 +200,10 @@ Adiciona um comentario a um ticket.
 
 Body JSON esperado:
 
-| Campo | Tipo | Obrigatorio | Descricao |
-| --- | --- | --- | --- |
-| authorId | string | Sim | ID do usuario que comentou. |
-| message | string | Sim | Texto do comentario. |
+| Campo    | Tipo   | Obrigatorio | Descricao                   |
+| -------- | ------ | ----------- | --------------------------- |
+| authorId | string | Sim         | ID do usuario que comentou. |
+| message  | string | Sim         | Texto do comentario.        |
 
 Exemplo:
 
@@ -289,7 +289,6 @@ A suite cobre os cenarios principais de fluxo:
 - comentarios
 
 ## Documentacao complementar
-
 
 **Quer entender o projeto?** Leia [README](./docs/README.md)
 

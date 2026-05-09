@@ -12,7 +12,7 @@ const users: User[] = [
 
 class UsersRepository {
   findAll(): User[] {
-    return users.map(u => ({ ...u }));
+    return users.map((u) => ({ ...u }));
   }
 
   findById(id: string): User | undefined {

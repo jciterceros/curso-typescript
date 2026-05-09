@@ -6,16 +6,16 @@ Documento de análise técnica completa da aplicação.
 
 ## 📈 Status Geral
 
-| Métrica | Status |
-|---------|--------|
-| **Linguagem** | ✅ 100% TypeScript (migração concluída) |
-| **Tipagem** | ✅ Strict mode habilitado |
-| **Validação** | ✅ Zod implementado em todos endpoints |
-| **Testes** | ✅ 11/11 passando (e2e com Supertest) |
-| **Build** | ✅ Compila sem erros (ES2022, ESM) |
-| **Cobertura** | ✅ Todos endpoints documentados |
-| **Documentação** | ✅ Completa (C4, ADRs, fluxos, API) |
-| **Arquitetura** | ✅ Padrão em camadas implementado |
+| Métrica          | Status                                  |
+| ---------------- | --------------------------------------- |
+| **Linguagem**    | ✅ 100% TypeScript (migração concluída) |
+| **Tipagem**      | ✅ Strict mode habilitado               |
+| **Validação**    | ✅ Zod implementado em todos endpoints  |
+| **Testes**       | ✅ 11/11 passando (e2e com Supertest)   |
+| **Build**        | ✅ Compila sem erros (ES2022, ESM)      |
+| **Cobertura**    | ✅ Todos endpoints documentados         |
+| **Documentação** | ✅ Completa (C4, ADRs, fluxos, API)     |
+| **Arquitetura**  | ✅ Padrão em camadas implementado       |
 
 ---
 
@@ -57,20 +57,24 @@ Documento de análise técnica completa da aplicação.
 ## 📦 Stack Tecnológico
 
 ### Runtime & Linguagem
+
 - **Node.js**: 24.x (latest features)
 - **TypeScript**: 6.x (com strict mode)
 - **Module System**: ESM (ECMAScript Modules)
 
 ### Web Framework
+
 - **Express**: 5.x
 - **Middleware de erro**: Custom global handler
 
 ### Validação de Dados
+
 - **Zod**: 4.x (schemas runtime)
 - Coerção automática (string → number)
 - Validações customizadas (refine)
 
 ### Testing
+
 - **Vitest**: 4.x (test runner)
 - **Supertest**: 7.x (HTTP testing)
 - **tsx**: 4.x (TypeScript executor)
@@ -89,10 +93,10 @@ src/
 ├── domain/ticket.ts                (14 linhas)
 │   ↳ Tipos: Ticket, CreateTicketDto, UpdateTicketDto
 │
-├── repositories/                   
+├── repositories/
 │   ├── tickets.repository.ts       (55 linhas)
-│   ├── comments.repository.ts      
-│   └── users.repository.ts         
+│   ├── comments.repository.ts
+│   └── users.repository.ts
 │   ↳ Dados em memória (singletons)
 │
 ├── services/
@@ -101,12 +105,12 @@ src/
 │
 ├── controllers/
 │   ├── tickets.controller.ts       (117 linhas)
-│   └── users.controller.ts         
+│   └── users.controller.ts
 │   ↳ HTTP: Validação com Zod + tratamento de error
 │
 ├── routes/
 │   ├── tickets.routes.ts           (11 linhas)
-│   └── users.routes.ts             
+│   └── users.routes.ts
 │   ↳ Definição de endpoints
 │
 ├── middlewares/
@@ -114,7 +118,7 @@ src/
 │   ↳ Tratamento global de erro
 │
 └── utils/
-    └── id.ts                       
+    └── id.ts
     ↳ Gerador de IDs
 ```
 
@@ -126,20 +130,20 @@ src/
 
 ### Tickets (6 endpoints)
 
-| Método | Rota | Função | Status |
-|--------|------|--------|--------|
-| GET | `/tickets` | Listar com filtros | ✅ |
-| POST | `/tickets` | Criar ticket | ✅ |
-| GET | `/tickets/:id` | Detalhes + comentários | ✅ |
-| GET | `/tickets/:id/summary` | Resumo simplificado | ✅ |
-| PATCH | `/tickets/:id` | Atualizar (parcial) | ✅ |
-| POST | `/tickets/:id/comments` | Adicionar comentário | ✅ |
+| Método | Rota                    | Função                 | Status |
+| ------ | ----------------------- | ---------------------- | ------ |
+| GET    | `/tickets`              | Listar com filtros     | ✅     |
+| POST   | `/tickets`              | Criar ticket           | ✅     |
+| GET    | `/tickets/:id`          | Detalhes + comentários | ✅     |
+| GET    | `/tickets/:id/summary`  | Resumo simplificado    | ✅     |
+| PATCH  | `/tickets/:id`          | Atualizar (parcial)    | ✅     |
+| POST   | `/tickets/:id/comments` | Adicionar comentário   | ✅     |
 
 ### Usuários (1 endpoint)
 
-| Método | Rota | Função | Status |
-|--------|------|--------|--------|
-| GET | `/users` | Listar usuários | ✅ |
+| Método | Rota     | Função          | Status |
+| ------ | -------- | --------------- | ------ |
+| GET    | `/users` | Listar usuários | ✅     |
 
 ---
 
@@ -149,11 +153,11 @@ src/
 
 ```typescript
 // Schemas disponíveis:
-- listTicketsQuerySchema    // Query: status, priority, limit, page
-- createTicketSchema        // Body: title, description, status, priority, assigneeId
-- updateTicketSchema        // Body: campos opcionais, min 1 obrigatório
-- addCommentSchema          // Body: authorId, message
-- statusSchema              // Enum: 'open' | 'closed' | 'in_progress'
+-listTicketsQuerySchema - // Query: status, priority, limit, page
+  createTicketSchema - // Body: title, description, status, priority, assigneeId
+  updateTicketSchema - // Body: campos opcionais, min 1 obrigatório
+  addCommentSchema - // Body: authorId, message
+  statusSchema; // Enum: 'open' | 'closed' | 'in_progress'
 ```
 
 ### Features
@@ -189,27 +193,27 @@ Cliente → Express → Controller
 ```typescript
 // Função safe para erro unknown
 const getErrorMessage = (error: unknown): string =>
-  error instanceof Error ? error.message : 'Invalid request';
+  error instanceof Error ? error.message : "Invalid request";
 
 // Middleware global
 errorMiddleware: (err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
-    message: 'Internal Server Error',
-    error: getErrorMessage(err)
+    message: "Internal Server Error",
+    error: getErrorMessage(err),
   });
-}
+};
 ```
 
 ### Status HTTP
 
-| Código | Uso |
-|--------|-----|
-| 200 | GET/PATCH bem-sucedido |
-| 201 | POST bem-sucedido |
-| 400 | Validação falhou |
-| 404 | Recurso não encontrado |
-| 500 | Erro interno |
+| Código | Uso                    |
+| ------ | ---------------------- |
+| 200    | GET/PATCH bem-sucedido |
+| 201    | POST bem-sucedido      |
+| 400    | Validação falhou       |
+| 404    | Recurso não encontrado |
+| 500    | Erro interno           |
 
 ---
 
@@ -290,22 +294,26 @@ npm run build  # Compila sem erros
 ## 📊 Métricas de Qualidade
 
 ### TypeScript
+
 - **Strict Mode**: ✅ ON
 - **No `any`**: ✅ Nenhum encontrado
 - **Tipos Explícitos**: ✅ 100%
 
 ### Código
+
 - **Coesão**: ✅ Alta (cada módulo tem responsabilidade clara)
 - **Acoplamento**: ✅ Baixo (dependências unidirecionais)
 - **Testabilidade**: ✅ Alta (services, repos isolados)
 - **Reusabilidade**: ✅ Schemas reutilizados
 
 ### Testes
+
 - **Cobertura**: ✅ Todos endpoints
 - **E2E**: ✅ Usando Supertest
 - **Status**: ✅ 11/11 passando
 
 ### Documentação
+
 - **C4 Models**: ✅ 5 níveis
 - **ADRs**: ✅ 4 decisões
 - **Fluxos**: ✅ 9 diagramas Mermaid
@@ -414,17 +422,20 @@ npm run build  # Compila sem erros
 ## 🚀 Próximos Passos Recomendados
 
 ### Curto Prazo (1-2 semanas)
+
 1. Implementar autenticação JWT
 2. Adicionar rate limiting
 3. Estruturar logging com Winston
 
 ### Médio Prazo (1-2 meses)
+
 1. Integrar PostgreSQL + Prisma
 2. Adicionar Swagger/OpenAPI
 3. Setup CI/CD (GitHub Actions)
 4. Docker + docker-compose
 
 ### Longo Prazo (3+ meses)
+
 1. Microserviços (se necessário escalabilidade)
 2. Event sourcing (histórico completo)
 3. CQRS (se read/write patterns divergirem)

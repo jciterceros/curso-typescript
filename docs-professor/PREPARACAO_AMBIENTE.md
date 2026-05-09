@@ -238,11 +238,13 @@ Antes de ir para a aula, teste o pendrive na sua máquina:
 Coloque o projeto do curso no pendrive:
 
 **Opção A:** Compactar o projeto em `.zip`
+
 ```
 ambiente-portatil/projeto-curso.zip
 ```
 
 **Opção B:** Clonar o repositório diretamente no pendrive
+
 ```
 ambiente-portatil/curso-typescript/
 ```
@@ -253,10 +255,10 @@ Recomendação: **Opção A** (zip), pois clonar em pendrive pode ser lento.
 
 ## Resumo - Downloads
 
-| Ferramenta | URL | Arquivo |
-|------------|-----|---------|
-| Node.js | https://nodejs.org/pt-br/download | Windows Binary (.zip) |
-| VS Code | https://code.visualstudio.com/download | Windows .zip (64-bit) |
-| Git | https://git-scm.com/download/win | Portable (Thumbdrive) |
-| Bruno | https://www.usebruno.com/downloads | Windows standalone |
-| Cmder | https://cmder.app/ | Mini version |
+| Ferramenta | URL                                    | Arquivo               |
+| ---------- | -------------------------------------- | --------------------- |
+| Node.js    | https://nodejs.org/pt-br/download      | Windows Binary (.zip) |
+| VS Code    | https://code.visualstudio.com/download | Windows .zip (64-bit) |
+| Git        | https://git-scm.com/download/win       | Portable (Thumbdrive) |
+| Bruno      | https://www.usebruno.com/downloads     | Windows standalone    |
+| Cmder      | https://cmder.app/                     | Mini version          |

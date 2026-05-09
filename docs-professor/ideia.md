@@ -6,11 +6,11 @@ Criar uma **API REST simples em Node.js + Express (JavaScript puro com ES Module
 
 A API será usada como base didática para um curso de introdução a TypeScript (migração JS → TS), então o projeto deve ser:
 
-* pequeno,
-* realista,
-* fácil de entender,
-* sem banco de dados (usar repositórios em memória),
-* com código suficientemente “imperfeito” para gerar valor pedagógico.
+- pequeno,
+- realista,
+- fácil de entender,
+- sem banco de dados (usar repositórios em memória),
+- com código suficientemente “imperfeito” para gerar valor pedagógico.
 
 ---
 
@@ -22,9 +22,9 @@ Uma API para gerenciar tickets de suporte.
 
 ### Entidades principais
 
-* **Ticket**
-* **Comment**
-* **User** (mock simples, só para atribuição de tickets)
+- **Ticket**
+- **Comment**
+- **User** (mock simples, só para atribuição de tickets)
 
 ---
 
@@ -34,49 +34,48 @@ Uma API para gerenciar tickets de suporte.
 
 #### Tickets
 
-* `POST /tickets` → criar ticket
-* `GET /tickets` → listar tickets (com filtros opcionais por query string)
-* `GET /tickets/:id` → buscar ticket por id
-* `PATCH /tickets/:id` → atualizar parcialmente ticket (status, prioridade, responsável)
-* `POST /tickets/:id/comments` → adicionar comentário ao ticket
+- `POST /tickets` → criar ticket
+- `GET /tickets` → listar tickets (com filtros opcionais por query string)
+- `GET /tickets/:id` → buscar ticket por id
+- `PATCH /tickets/:id` → atualizar parcialmente ticket (status, prioridade, responsável)
+- `POST /tickets/:id/comments` → adicionar comentário ao ticket
 
 #### Users
 
-* `GET /users` → listar usuários (mock)
+- `GET /users` → listar usuários (mock)
 
 ---
 
 ## Regras de negócio (simples)
 
-* Ticket tem:
+- Ticket tem:
+  - `id`
+  - `title`
+  - `description`
+  - `status`
+  - `priority`
+  - `assigneeId` (opcional)
+  - `createdAt`
+  - `updatedAt`
 
-  * `id`
-  * `title`
-  * `description`
-  * `status`
-  * `priority`
-  * `assigneeId` (opcional)
-  * `createdAt`
-  * `updatedAt`
-* Comment tem:
+- Comment tem:
+  - `id`
+  - `ticketId`
+  - `authorId`
+  - `message`
+  - `createdAt`
 
-  * `id`
-  * `ticketId`
-  * `authorId`
-  * `message`
-  * `createdAt`
-* User tem:
-
-  * `id`
-  * `name`
-  * `email`
+- User tem:
+  - `id`
+  - `name`
+  - `email`
 
 ### Valores esperados (mas **não validar corretamente em JS** de propósito)
 
-* `status` idealmente seria algo como:
+- `status` idealmente seria algo como:
+  - `"open" | "in_progress" | "closed"`
 
-  * `"open" | "in_progress" | "closed"`
-* `priority` idealmente seria número (`1` a `5`)
+- `priority` idealmente seria número (`1` a `5`)
 
 ---
 
@@ -108,15 +107,15 @@ src/
 
 ### Requisitos de implementação
 
-* Express
-* ES Modules (`"type": "module"` no `package.json`)
-* imports/exports com sintaxe `import`/`export`
-* `express.json()`
-* Dados em memória (`array` ou `Map`)
-* Sem ORM
-* Sem banco
-* Sem autenticação real (se quiser, pode simular um user fixo)
-* O projeto precisa rodar com `node src/app.js` (ou script npm equivalente)
+- Express
+- ES Modules (`"type": "module"` no `package.json`)
+- imports/exports com sintaxe `import`/`export`
+- `express.json()`
+- Dados em memória (`array` ou `Map`)
+- Sem ORM
+- Sem banco
+- Sem autenticação real (se quiser, pode simular um user fixo)
+- O projeto precisa rodar com `node src/app.js` (ou script npm equivalente)
 
 ---
 
@@ -132,10 +131,10 @@ No `POST /tickets` e `PATCH /tickets/:id`, aceitar `status` sem validação fort
 
 Exemplos que devem passar em JS:
 
-* `"open"`
-* `"closed"`
-* `"closedd"` (typo)
-* `"done"` (valor não previsto)
+- `"open"`
+- `"closed"`
+- `"closedd"` (typo)
+- `"done"` (valor não previsto)
 
 #### Valor pedagógico
 
@@ -149,8 +148,8 @@ Depois no TS isso vira union (`'open' | 'in_progress' | 'closed'`) e o compilado
 
 Permitir que `priority` seja salvo como:
 
-* `2` (number)
-* `"2"` (string)
+- `2` (number)
+- `"2"` (string)
 
 Sem normalizar.
 
@@ -162,8 +161,8 @@ Em listagem/ordenação, isso pode gerar comportamento estranho ou inconsistente
 
 Excelente para mostrar:
 
-* diferença entre JS permissivo e contratos de tipo
-* necessidade de parse/validação de entrada
+- diferença entre JS permissivo e contratos de tipo
+- necessidade de parse/validação de entrada
 
 ---
 
@@ -175,7 +174,7 @@ No `GET /tickets`, ler query params diretamente como se fossem números.
 
 Exemplo:
 
-* `?limit=10&page=1&priority=2`
+- `?limit=10&page=1&priority=2`
 
 Mas o código usa sem parse (`Number(...)`), contando com coerção implícita.
 
@@ -191,8 +190,8 @@ Depois no TS fica claro que query params chegam como string/unknown e precisam d
 
 No repository/service, ter retornos inconsistentes:
 
-* em alguns casos `null`
-* em outros `undefined`
+- em alguns casos `null`
+- em outros `undefined`
 
 Sem contrato claro.
 
@@ -214,9 +213,9 @@ Talvez apenas checks superficiais (ex.: `if (!title) ...`), mas nada consistente
 
 Depois é o ponto ideal para introduzir:
 
-* `unknown` vs `any`
-* validação com Zod
-* inferência de tipos com `z.infer`
+- `unknown` vs `any`
+- validação com Zod
+- inferência de tipos com `z.infer`
 
 ---
 
@@ -228,8 +227,8 @@ No `PATCH /tickets/:id`, aplicar tudo que vier no body via merge simples (`Objec
 
 Exemplos que devem “passar”:
 
-* mudar `createdAt`
-* adicionar campo aleatório (`foo: "bar"`)
+- mudar `createdAt`
+- adicionar campo aleatório (`foo: "bar"`)
 
 #### Valor pedagógico
 
@@ -245,7 +244,7 @@ Use `id` como string na entidade, mas em algum ponto faça comparação/tratamen
 
 Exemplo:
 
-* `req.params.id` comparado com `Number(...)` em um método, mas string em outro.
+- `req.params.id` comparado com `Number(...)` em um método, mas string em outro.
 
 #### Valor pedagógico
 
@@ -259,9 +258,9 @@ Mostra inconsistência de contrato e como TS ajuda a padronizar.
 
 Alguns métodos retornam:
 
-* `{ data: ticket }`
+- `{ data: ticket }`
   Outros retornam:
-* `{ ticket }`
+- `{ ticket }`
   Outros retornam o objeto direto.
 
 #### Valor pedagógico
@@ -274,11 +273,11 @@ Bom para introduzir contrato de retorno e, depois, union `ok/error`.
 
 Apesar das ambiguidades, a API deve:
 
-* iniciar e responder rotas
-* permitir criar/listar/atualizar tickets
-* permitir comentar ticket
-* retornar JSON
-* ter alguns dados mockados de usuários
+- iniciar e responder rotas
+- permitir criar/listar/atualizar tickets
+- permitir comentar ticket
+- retornar JSON
+- ter alguns dados mockados de usuários
 
 Ou seja: projeto **funcional o suficiente para demo**, porém **propositalmente frouxo** em contratos.
 
@@ -288,7 +287,7 @@ Ou seja: projeto **funcional o suficiente para demo**, porém **propositalmente 
 
 Criar alguns usuários mock:
 
-* `u1`, `u2`, `u3`
+- `u1`, `u2`, `u3`
 
 Criar 2–3 tickets iniciais e alguns comentários para facilitar testes de listagem e update.
 
@@ -296,13 +295,13 @@ Criar 2–3 tickets iniciais e alguns comentários para facilitar testes de list
 
 ## O que NÃO precisa (para manter simples)
 
-* banco de dados
-* autenticação JWT
-* testes automatizados como conteúdo da versão base
-* documentação Swagger
-* classes/POO complexa
-* validação robusta
-* TypeScript (nesta versão base deve ser JS)
+- banco de dados
+- autenticação JWT
+- testes automatizados como conteúdo da versão base
+- documentação Swagger
+- classes/POO complexa
+- validação robusta
+- TypeScript (nesta versão base deve ser JS)
 
 ---
 
@@ -310,9 +309,9 @@ Criar 2–3 tickets iniciais e alguns comentários para facilitar testes de list
 
 ### 1) Código legível (mesmo sendo “imperfeito”)
 
-* nomes claros de funções
-* separação por camadas
-* evitar “bagunça total”
+- nomes claros de funções
+- separação por camadas
+- evitar “bagunça total”
 
 ### 2) Deixar pontos fáceis de migrar
 
@@ -320,9 +319,9 @@ Ex.: funções em arquivos separados, para facilitar renomear `.js` → `.ts`.
 
 ### 3) Incluir um README simples com exemplos de requests
 
-* exemplos de `POST /tickets`
-* `PATCH /tickets/:id`
-* `GET /tickets?status=open&limit=10`
+- exemplos de `POST /tickets`
+- `PATCH /tickets/:id`
+- `GET /tickets?status=open&limit=10`
 
 ---
 

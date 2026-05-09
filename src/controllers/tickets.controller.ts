@@ -7,14 +7,11 @@ import { ERROR_MESSAGES } from "../constants/error-messages.js";
 const statusSchema = z.enum(["open", "closed", "in_progress"]);
 
 const numberFromInputSchema = (min: number, max: number) =>
-  z.preprocess(
-    (value) => {
-      if (value === undefined) return undefined;
-      if (typeof value === "string" && value.trim() === "") return Number.NaN;
-      return Number(value);
-    },
-    z.number().int().min(min).max(max),
-  );
+  z.preprocess((value) => {
+    if (value === undefined) return undefined;
+    if (typeof value === "string" && value.trim() === "") return Number.NaN;
+    return Number(value);
+  }, z.number().int().min(min).max(max));
 
 const listTicketsQuerySchema = z.object({
   status: statusSchema.optional(),

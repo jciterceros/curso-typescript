@@ -1,4 +1,4 @@
-export type TicketStatus = 'open' | 'closed' | 'in_progress';
+export type TicketStatus = "open" | "closed" | "in_progress";
 export interface Ticket {
   id: string;
   title: string;
@@ -10,5 +10,7 @@ export interface Ticket {
   updatedAt: Date;
 }
 
-export type CreateTicketDto = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
-export type UpdateTicketDto = Partial<Pick<Ticket, 'title' | 'description' | 'status' | 'priority' | 'assigneeId'>>;
+export type CreateTicketDto = Omit<Ticket, "id" | "createdAt" | "updatedAt">;
+export type UpdateTicketDto = Partial<
+  Pick<Ticket, "title" | "description" | "status" | "priority" | "assigneeId">
+>;

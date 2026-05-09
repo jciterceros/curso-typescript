@@ -1,6 +1,7 @@
 # Fluxo 04 - POST /tickets
 
 ## Objetivo
+
 Criar um novo ticket.
 
 ## Sequência
@@ -26,4 +27,5 @@ sequenceDiagram
 ```
 
 ## Caminho de erro local
+
 Se ocorrer exceção no fluxo de criação, o controller retorna `400` com mensagem.

@@ -7,8 +7,8 @@ const app = express();
 
 app.use(express.json());
 
-app.use('/tickets', ticketsRoutes);
-app.use('/users', usersRoutes);
+app.use("/tickets", ticketsRoutes);
+app.use("/users", usersRoutes);
 
 app.use(errorMiddleware);
 

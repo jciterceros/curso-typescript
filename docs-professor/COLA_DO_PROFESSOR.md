@@ -285,7 +285,7 @@ src/domain/
 Em `src/domain/ticket.ts`:
 
 ```ts
-export type TicketStatus = 'open' | 'in_progress' | 'closed';
+export type TicketStatus = "open" | "in_progress" | "closed";
 
 export interface Ticket {
   id: string;
@@ -307,7 +307,7 @@ export type CreateTicketDTO = {
 };
 
 export type UpdateTicketDTO = Partial<
-  Pick<Ticket, 'title' | 'description' | 'status' | 'priority' | 'assigneeId'>
+  Pick<Ticket, "title" | "description" | "status" | "priority" | "assigneeId">
 >;
 ```
 
@@ -348,13 +348,13 @@ Use este momento para corrigir o bug da prioridade inicial:
 Antes:
 
 ```js
-priority: '3'
+priority: "3";
 ```
 
 Depois:
 
 ```ts
-priority: 3
+priority: 3;
 ```
 
 Explique que isso não resolve entrada externa ainda. Só resolve o dado interno conhecido.
@@ -374,13 +374,13 @@ Use isso para mostrar `strictNullChecks`: antes de acessar propriedades, o servi
 Ao tipar `getTicketSummary`, o TypeScript deve reclamar de:
 
 ```ts
-ticket.desc
+ticket.desc;
 ```
 
 Corrija para:
 
 ```ts
-ticket.description
+ticket.description;
 ```
 
 Esse é um dos melhores momentos pedagógicos do curso: um bug silencioso em JS vira erro claro em TS.
@@ -474,16 +474,16 @@ src/schemas/
 Conteúdo sugerido:
 
 ```ts
-import { z } from 'zod';
+import { z } from "zod";
 
-export const ticketStatusSchema = z.enum(['open', 'in_progress', 'closed']);
+export const ticketStatusSchema = z.enum(["open", "in_progress", "closed"]);
 
 export const createTicketSchema = z.object({
   title: z.string().min(3),
   description: z.string().min(5),
-  status: ticketStatusSchema.default('open'),
+  status: ticketStatusSchema.default("open"),
   priority: z.coerce.number().int().min(1).max(5),
-  assigneeId: z.string().optional()
+  assigneeId: z.string().optional(),
 });
 
 export type CreateTicketInput = z.infer<typeof createTicketSchema>;
@@ -506,7 +506,7 @@ try {
   const result = ticketsService.createTicket(data);
   res.status(201).json(result);
 } catch (error) {
-  res.status(400).json({ error: 'Invalid payload' });
+  res.status(400).json({ error: "Invalid payload" });
 }
 ```
 
@@ -578,9 +578,7 @@ Consolidar os conceitos, mostrar tratamento tipado de estados/erros e, se houver
 Introduza uma union simples:
 
 ```ts
-type ServiceResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: string; statusCode: number };
+type ServiceResult<T> = { ok: true; data: T } | { ok: false; error: string; statusCode: number };
 ```
 
 Use em um método como `getTicketById` ou `updateTicket`.
@@ -628,7 +626,7 @@ export const listTicketsQuerySchema = z.object({
   status: ticketStatusSchema.optional(),
   priority: z.coerce.number().int().min(1).max(5).optional(),
   limit: z.coerce.number().int().positive().default(10),
-  page: z.coerce.number().int().positive().default(1)
+  page: z.coerce.number().int().positive().default(1),
 });
 
 export type ListTicketsQuery = z.infer<typeof listTicketsQuerySchema>;
@@ -645,13 +643,13 @@ Corrija comparações frouxas:
 Antes:
 
 ```js
-t.priority == priority
+t.priority == priority;
 ```
 
 Depois:
 
 ```ts
-t.priority === priority
+t.priority === priority;
 ```
 
 Explique que a validação remove a necessidade de coerção implícita.
@@ -672,7 +670,7 @@ export const updateTicketSchema = z.object({
   description: z.string().min(5).optional(),
   status: ticketStatusSchema.optional(),
   priority: z.coerce.number().int().min(1).max(5).optional(),
-  assigneeId: z.string().optional()
+  assigneeId: z.string().optional(),
 });
 ```
 

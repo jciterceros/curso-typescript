@@ -5,9 +5,11 @@
 - **Revisado em:** 2026-05-09
 
 ## Contexto
+
 O projeto precisa de comportamento previsível de erro para consumo de API e testes automatizados.
 
 ## Decisão
+
 Adotar hierarquia de erros tipados com mapeamento central no middleware global:
 
 - `src/errors/app-error.ts` define a classe base `AppError` e subclasses:
@@ -21,6 +23,7 @@ Adotar hierarquia de erros tipados com mapeamento central no middleware global:
 - Códigos de erro centralizados em `src/constants/error-codes.ts`.
 
 ### Formato do payload de erro (domínio/validação)
+
 ```json
 {
   "code": "INVALID_REQUEST",
@@ -30,6 +33,7 @@ Adotar hierarquia de erros tipados com mapeamento central no middleware global:
 ```
 
 ### Formato do payload de erro (fallback interno)
+
 ```json
 {
   "code": "INTERNAL_SERVER_ERROR",
@@ -39,7 +43,9 @@ Adotar hierarquia de erros tipados com mapeamento central no middleware global:
 ```
 
 ## Consequências
+
 ### Positivas
+
 - Respostas de erro consistentes em todos os endpoints.
 - Nenhuma string de erro duplicada no código.
 - Erros internos não são mascarados como erros de cliente.
@@ -47,5 +53,6 @@ Adotar hierarquia de erros tipados com mapeamento central no middleware global:
 - Fácil adição de novos tipos de erro: basta estender `AppError`.
 
 ### Negativas
+
 - Para um projeto pequeno, adiciona mais arquivos de suporte.
 - Requer disciplina para sempre usar os tipos tipados em vez de `throw new Error()`.

@@ -1,6 +1,7 @@
 # Fluxo 08 - Middleware global de erro
 
 ## Objetivo
+
 Padronizar resposta de erro não tratado em runtime.
 
 ## Sequência
@@ -24,6 +25,7 @@ sequenceDiagram
 ```
 
 ## Resposta padrão atual
+
 - `status`: `500`
 - body:
   - `message`: `Internal Server Error`

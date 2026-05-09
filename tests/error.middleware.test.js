@@ -49,7 +49,9 @@ describe("error middleware", () => {
     };
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const error = new ValidationError("Invalid request", { fieldErrors: { status: ["Invalid enum value"] } });
+    const error = new ValidationError("Invalid request", {
+      fieldErrors: { status: ["Invalid enum value"] },
+    });
     errorMiddleware(error, {}, res, vi.fn());
 
     expect(consoleError).not.toHaveBeenCalled();

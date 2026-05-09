@@ -1,6 +1,7 @@
 # Fluxo 02 - GET /tickets/:id
 
 ## Objetivo
+
 Retornar um ticket por ID incluindo comentários relacionados.
 
 ## Sequência

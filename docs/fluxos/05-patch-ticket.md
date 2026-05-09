@@ -1,6 +1,7 @@
 # Fluxo 05 - PATCH /tickets/:id
 
 ## Objetivo
+
 Atualizar parcialmente um ticket existente.
 
 ## Sequência

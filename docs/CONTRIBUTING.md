@@ -21,6 +21,7 @@ Padrões, convenções e melhores práticas para desenvolver no projeto.
 ### Nomenclatura
 
 #### Pastas/Módulos
+
 ```typescript
 // Minúsculas, plural quando apropriado
 src/controllers/
@@ -32,6 +33,7 @@ src/utils/
 ```
 
 #### Classes e Interfaces
+
 ```typescript
 // PascalCase
 class TicketsController {}
@@ -40,6 +42,7 @@ interface CreateTicketDto {}
 ```
 
 #### Funções e Variáveis
+
 ```typescript
 // camelCase
 function getTicketById(id: string) {}
@@ -47,6 +50,7 @@ const ticketData = {};
 ```
 
 #### Constantes
+
 ```typescript
 // UPPER_SNAKE_CASE
 const DEFAULT_LIMIT = 10;
@@ -64,7 +68,7 @@ class TicketsService {
 export default new TicketsService();
 
 // Uso:
-import ticketsService from '../services/tickets.service.js';
+import ticketsService from "../services/tickets.service.js";
 ```
 
 ---
@@ -89,7 +93,7 @@ function getTicket(id) {
 
 ```typescript
 // ✅ Padrão do projeto
-import type { Request, Response } from 'express';
+import type { Request, Response } from "express";
 
 class TicketsController {
   // Sem parâmetros
@@ -124,13 +128,13 @@ export interface Ticket {
   // ... completo
 }
 
-export type CreateTicketDto = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
-export type UpdateTicketDto = Partial<Pick<Ticket, 'title' | 'status' | 'priority'>>;
+export type CreateTicketDto = Omit<Ticket, "id" | "createdAt" | "updatedAt">;
+export type UpdateTicketDto = Partial<Pick<Ticket, "title" | "status" | "priority">>;
 
 // Uso:
 class TicketsRepository {
-  create(data: CreateTicketDto): Ticket { }
-  update(id: string, data: UpdateTicketDto): Ticket | null { }
+  create(data: CreateTicketDto): Ticket {}
+  update(id: string, data: UpdateTicketDto): Ticket | null {}
 }
 ```
 
@@ -142,7 +146,7 @@ function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-  return 'Unknown error';
+  return "Unknown error";
 }
 
 // Uso:
@@ -157,11 +161,11 @@ try {
 
 ```typescript
 // ✅ Use para tipos puros (não executáveis)
-import type { Request, Response } from 'express';
-import type { Ticket } from '../domain/ticket.js';
+import type { Request, Response } from "express";
+import type { Ticket } from "../domain/ticket.js";
 
 // ❌ Evite para módulos que precisa executar
-import express from 'express'; // Sem "type"
+import express from "express"; // Sem "type"
 ```
 
 ---
@@ -172,7 +176,7 @@ import express from 'express'; // Sem "type"
 
 ```typescript
 // ✅ Definir schemas uma vez
-const statusSchema = z.enum(['open', 'closed', 'in_progress']);
+const statusSchema = z.enum(["open", "closed", "in_progress"]);
 const prioritySchema = z.number().int().min(1).max(5);
 
 const createTicketSchema = z.object({
@@ -202,15 +206,12 @@ class TicketsController {
 
 ```typescript
 // ✅ Converter string → number automaticamente
-const numberSchema = z.preprocess(
-  (value) => {
-    if (typeof value === 'string') {
-      return Number(value);
-    }
-    return value;
-  },
-  z.number().int().min(1).max(5)
-);
+const numberSchema = z.preprocess((value) => {
+  if (typeof value === "string") {
+    return Number(value);
+  }
+  return value;
+}, z.number().int().min(1).max(5));
 
 // Uso em query parsing:
 const listSchema = z.object({
@@ -230,10 +231,7 @@ const updateSchema = z
     title: z.string().min(3).optional(),
     status: statusSchema.optional(),
   })
-  .refine(
-    (data) => Object.keys(data).length > 0,
-    { message: 'At least one field is required' }
-  );
+  .refine((data) => Object.keys(data).length > 0, { message: "At least one field is required" });
 ```
 
 ---
@@ -246,25 +244,25 @@ const updateSchema = z
 src/
 ├── domain/
 │   └── ticket.ts                 # Tipos + DTOs
-│   
+│
 ├── repositories/
 │   └── tickets.repository.ts     # Persistência
-│   
+│
 ├── services/
 │   └── tickets.service.ts        # Lógica de negócio
-│   
+│
 ├── controllers/
 │   └── tickets.controller.ts     # HTTP + Validação
-│   
+│
 ├── routes/
 │   └── tickets.routes.ts         # Definição de rotas
-│   
+│
 ├── middlewares/
 │   └── error.middleware.ts       # Tratamento global
-│   
+│
 ├── utils/
 │   └── id.ts                     # Utilitários
-│   
+│
 └── app.ts                        # Express setup
 ```
 
@@ -289,16 +287,16 @@ Domain
 ### Estrutura de Teste
 
 ```typescript
-import request from 'supertest';
-import { spawn } from 'node:child_process';
+import request from "supertest";
+import { spawn } from "node:child_process";
 
-describe('Tickets', () => {
+describe("Tickets", () => {
   let api;
   let server;
 
   beforeEach(async () => {
     // Setup: iniciar servidor
-    server = spawn(process.execPath, ['--import', 'tsx', 'src/app.ts']);
+    server = spawn(process.execPath, ["--import", "tsx", "src/app.ts"]);
     api = request(`http://127.0.0.1:${PORT}`);
   });
 
@@ -306,15 +304,15 @@ describe('Tickets', () => {
     server.kill();
   });
 
-  it('should list tickets', async () => {
-    const response = await api.get('/tickets');
+  it("should list tickets", async () => {
+    const response = await api.get("/tickets");
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('data');
+    expect(response.body).toHaveProperty("data");
     expect(Array.isArray(response.body.data)).toBe(true);
   });
 
-  it('should return 404 for invalid ticket', async () => {
-    const response = await api.get('/tickets/invalid-id');
+  it("should return 404 for invalid ticket", async () => {
+    const response = await api.get("/tickets/invalid-id");
     expect(response.status).toBe(404);
   });
 });
@@ -352,10 +350,7 @@ counter++;
 
 // ✅ Explicar lógica complexa
 // Usar Zod preprocessing porque query params vêm como string
-const numberSchema = z.preprocess(
-  (value) => Number(value),
-  z.number()
-);
+const numberSchema = z.preprocess((value) => Number(value), z.number());
 ```
 
 ### JSDoc
@@ -363,7 +358,7 @@ const numberSchema = z.preprocess(
 ```typescript
 /**
  * Cria novo ticket com validação
- * 
+ *
  * @param ticketData - Dados do ticket (title, description, status, priority)
  * @returns Ticket criado com ID gerado
  * @throws {Error} Se dados inválidos
@@ -427,16 +422,19 @@ function createTicket(ticketData: CreateTicketDto): Ticket {
 ## 📊 Métricas de Qualidade
 
 ### TypeScript
+
 - ✅ Strict mode ativo
 - ✅ Sem `any`
 - ✅ Sem `!` (non-null assertion) desnecessário
 
 ### Código
+
 - ✅ Nomes descritivos (função → responsabilidade clara)
 - ✅ Funções pequenas (< 20 linhas)
 - ✅ Tratamento de erro em todo lugar
 
 ### Testes
+
 - ✅ 11/11 testes passando
 - ✅ Todos endpoints cobertos
 
@@ -445,16 +443,19 @@ function createTicket(ticketData: CreateTicketDto): Ticket {
 ## 🚀 Deploy
 
 ### Build
+
 ```bash
 npm run build
 ```
 
 ### Executar
+
 ```bash
 npm start
 ```
 
 ### Variáveis de Ambiente
+
 ```bash
 PORT=3000          # Default: 3000
 NODE_ENV=production
@@ -481,6 +482,7 @@ R: Converse com a equipe. Express, Zod e TypeScript são core. Outras devem ser 
 ## 📞 Contato
 
 Dúvidas? Consulte:
+
 - [Arquitetura em Camadas](../adr/0001-arquitetura-em-camadas.md)
 - [Fluxos de Negócio](../fluxos/README.md)
 - [Quick Start](./QUICKSTART.md)

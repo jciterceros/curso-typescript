@@ -1,6 +1,7 @@
 # Fluxo 07 - GET /users
 
 ## Objetivo
+
 Listar usuários mockados.
 
 ## Sequência

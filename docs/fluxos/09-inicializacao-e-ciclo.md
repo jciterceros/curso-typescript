@@ -1,6 +1,7 @@
 # Fluxo 09 - Inicialização e ciclo de requisição
 
 ## Objetivo
+
 Mostrar boot da aplicação e encadeamento de middlewares/rotas.
 
 ## Diagrama de fluxo

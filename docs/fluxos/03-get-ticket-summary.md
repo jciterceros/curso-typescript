@@ -1,6 +1,7 @@
 # Fluxo 03 - GET /tickets/:id/summary
 
 ## Objetivo
+
 Retornar resumo de um ticket.
 
 ## Sequência
@@ -30,4 +31,5 @@ sequenceDiagram
 ```
 
 ## Observação
+
 No estado atual, `short_desc` referencia `ticket.description`.

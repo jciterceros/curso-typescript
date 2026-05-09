@@ -3,6 +3,9 @@ import commentsRepository from "../repositories/comments.repository.js";
 import { CreateTicketDto, TicketStatus, UpdateTicketDto } from "../domain/ticket.js";
 import type { CreateCommentDto } from "../domain/comment.js";
 import usersRepository from "../repositories/users.repository.js";
+import type { ITicketsRepository } from "../repositories/tickets.repository.js";
+import type { ICommentsRepository } from "../repositories/comments.repository.js";
+import type { IUsersRepository } from "../repositories/users.repository.js";
 import { ValidationError } from "../errors/app-error.js";
 import { ERROR_CODES } from "../constants/error-codes.js";
 import { ERROR_MESSAGES } from "../constants/error-messages.js";
@@ -16,10 +19,18 @@ type ListTicketsFilters = {
 
 type AddCommentInput = Omit<CreateCommentDto, "ticketId">;
 
+type TicketsServiceDeps = {
+  ticketsRepository: ITicketsRepository;
+  commentsRepository: ICommentsRepository;
+  usersRepository: IUsersRepository;
+};
+
 class TicketsService {
+  constructor(private readonly deps: TicketsServiceDeps) { }
+
   private validateAssigneeExists(assigneeId: string | undefined): void {
     if (!assigneeId) return;
-    const user = usersRepository.findById(assigneeId);
+    const user = this.deps.usersRepository.findById(assigneeId);
     if (!user) {
       throw new ValidationError(
         ERROR_MESSAGES.INVALID_REQUEST,
@@ -31,7 +42,7 @@ class TicketsService {
 
   listTickets(filters: ListTicketsFilters) {
     const { status, priority, limit = 10, page = 1 } = filters;
-    let tickets = ticketsRepository.findAll();
+    let tickets = this.deps.ticketsRepository.findAll();
 
     if (status) {
       tickets = tickets.filter((t) => t.status === status);
@@ -56,10 +67,10 @@ class TicketsService {
   }
 
   getTicketById(id: string) {
-    const ticket = ticketsRepository.findById(id);
+    const ticket = this.deps.ticketsRepository.findById(id);
     if (!ticket) return null;
 
-    const comments = commentsRepository.findByTicketId(id);
+    const comments = this.deps.commentsRepository.findByTicketId(id);
 
     return {
       ...ticket,
@@ -68,7 +79,7 @@ class TicketsService {
   }
 
   getTicketSummary(id: string) {
-    const ticket = ticketsRepository.findById(id);
+    const ticket = this.deps.ticketsRepository.findById(id);
     if (!ticket) return null;
 
     return {
@@ -81,26 +92,30 @@ class TicketsService {
 
   createTicket(ticketData: CreateTicketDto) {
     this.validateAssigneeExists(ticketData.assigneeId);
-    const ticket = ticketsRepository.create(ticketData);
+    const ticket = this.deps.ticketsRepository.create(ticketData);
 
     return { ticket };
   }
 
   updateTicket(id: string, updateData: UpdateTicketDto) {
     this.validateAssigneeExists(updateData.assigneeId);
-    const ticket = ticketsRepository.update(id, updateData);
+    const ticket = this.deps.ticketsRepository.update(id, updateData);
     return ticket;
   }
 
   addComment(ticketId: string, commentData: AddCommentInput) {
-    const ticket = ticketsRepository.findById(ticketId);
+    const ticket = this.deps.ticketsRepository.findById(ticketId);
     if (!ticket) return null;
 
-    return commentsRepository.create({
+    return this.deps.commentsRepository.create({
       ticketId,
       ...commentData,
     });
   }
 }
 
-export default new TicketsService();
+export default new TicketsService({
+  ticketsRepository,
+  commentsRepository,
+  usersRepository,
+});

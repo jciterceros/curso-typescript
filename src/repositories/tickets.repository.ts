@@ -1,6 +1,13 @@
 import { CreateTicketDto, Ticket, UpdateTicketDto } from "../domain/ticket.js";
 import { generateId } from "../utils/id.js";
 
+export interface ITicketsRepository {
+  findAll(): Ticket[];
+  findById(id: string): Ticket | null;
+  create(data: CreateTicketDto): Ticket;
+  update(id: string, data: UpdateTicketDto): Ticket | null;
+}
+
 const initialTickets: Ticket[] = [
   {
     id: "t1",
@@ -37,7 +44,7 @@ export function resetTicketsRepository(): void {
   tickets.push(...initialTickets.map(cloneTicket));
 }
 
-class TicketsRepository {
+class TicketsRepository implements ITicketsRepository {
   findAll(): Ticket[] {
     return tickets.map(cloneTicket);
   }
@@ -67,4 +74,6 @@ class TicketsRepository {
   }
 }
 
-export default new TicketsRepository();
+const ticketsRepository: ITicketsRepository = new TicketsRepository();
+
+export default ticketsRepository;

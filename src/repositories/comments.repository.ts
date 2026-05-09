@@ -1,6 +1,11 @@
 import { generateId } from "../utils/id.js";
 import type { Comment, CreateCommentDto } from "../domain/comment.js";
 
+export interface ICommentsRepository {
+  findByTicketId(ticketId: string): Comment[];
+  create(data: CreateCommentDto): Comment;
+}
+
 const initialComments: Comment[] = [
   {
     id: "c1",
@@ -23,7 +28,7 @@ export function resetCommentsRepository(): void {
   comments.push(...initialComments.map(cloneComment));
 }
 
-class CommentsRepository {
+class CommentsRepository implements ICommentsRepository {
   findByTicketId(ticketId: string): Comment[] {
     return comments.filter((c) => c.ticketId === ticketId);
   }
@@ -39,4 +44,6 @@ class CommentsRepository {
   }
 }
 
-export default new CommentsRepository();
+const commentsRepository: ICommentsRepository = new CommentsRepository();
+
+export default commentsRepository;

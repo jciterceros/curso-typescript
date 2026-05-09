@@ -1,6 +1,8 @@
 import ticketsRepository from '../repositories/tickets.repository.js';
 import commentsRepository from '../repositories/comments.repository.js';
 import { CreateTicketDto, TicketStatus, UpdateTicketDto } from '../domain/ticket.js';
+import { NotFoundError } from '../errors/app-error.js';
+import { ERROR_MESSAGES } from '../constants/error-messages.js';
 
 type ListTicketsFilters = {
   status?: TicketStatus;
@@ -74,7 +76,7 @@ class TicketsService {
   addComment(ticketId: string, commentData: CreateCommentDto) {
     const ticket = ticketsRepository.findById(ticketId);
     if (!ticket) {
-      throw new Error('Ticket not found');
+      throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
     }
 
     return commentsRepository.create({

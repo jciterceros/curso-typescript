@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 import ticketsService from "../services/tickets.service.js";
+import { NotFoundError, ValidationError } from "../errors/app-error.js";
+import { ERROR_MESSAGES } from "../constants/error-messages.js";
 
 const statusSchema = z.enum(["open", "closed", "in_progress"]);
 
@@ -46,24 +48,25 @@ const addCommentSchema = z.object({
   message: z.string().min(1),
 });
 
-const getErrorMessage = (error: unknown): string =>
-  error instanceof Error ? error.message : "Invalid request";
+const parseOrThrow = <T>(schema: z.ZodType<T>, input: unknown): T => {
+  const parsed = schema.safeParse(input);
+  if (!parsed.success) {
+    throw new ValidationError(ERROR_MESSAGES.INVALID_REQUEST, { issues: parsed.error.issues });
+  }
+  return parsed.data;
+};
 
 class TicketsController {
   index(req: Request, res: Response) {
-    try {
-      const filters = listTicketsQuerySchema.parse(req.query);
-      const result = ticketsService.listTickets(filters);
-      res.json(result);
-    } catch (error) {
-      res.status(400).json({ error: getErrorMessage(error) });
-    }
+    const filters = parseOrThrow(listTicketsQuerySchema, req.query);
+    const result = ticketsService.listTickets(filters);
+    res.json(result);
   }
 
   show(req: Request<{ id: string }>, res: Response) {
     const ticket = ticketsService.getTicketById(req.params.id);
     if (!ticket) {
-      return res.status(404).json({ error: "Ticket not found" });
+      throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
     }
     res.json(ticket);
   }
@@ -71,45 +74,30 @@ class TicketsController {
   summary(req: Request<{ id: string }>, res: Response) {
     const summary = ticketsService.getTicketSummary(req.params.id);
     if (!summary) {
-      return res.status(404).json({ error: "Ticket not found" });
+      throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
     }
     res.json(summary);
   }
 
   store(req: Request, res: Response) {
-    try {
-      const ticketData = createTicketSchema.parse(req.body);
-      const result = ticketsService.createTicket(ticketData);
-      res.status(201).json(result);
-    } catch (error) {
-      res.status(400).json({ error: getErrorMessage(error) });
-    }
+    const ticketData = parseOrThrow(createTicketSchema, req.body);
+    const result = ticketsService.createTicket(ticketData);
+    res.status(201).json(result);
   }
 
   update(req: Request<{ id: string }>, res: Response) {
-    try {
-      const updateData = updateTicketSchema.parse(req.body);
-      const ticket = ticketsService.updateTicket(req.params.id, updateData);
-      if (!ticket) {
-        return res.status(404).json({ error: "Ticket not found" });
-      }
-      res.json(ticket);
-    } catch (error) {
-      res.status(400).json({ error: getErrorMessage(error) });
+    const updateData = parseOrThrow(updateTicketSchema, req.body);
+    const ticket = ticketsService.updateTicket(req.params.id, updateData);
+    if (!ticket) {
+      throw new NotFoundError(ERROR_MESSAGES.TICKET_NOT_FOUND);
     }
+    res.json(ticket);
   }
 
   addComment(req: Request<{ id: string }>, res: Response) {
-    try {
-      const commentData = addCommentSchema.parse(req.body);
-      const comment = ticketsService.addComment(req.params.id, commentData);
-      res.status(201).json(comment);
-    } catch (error) {
-      if (error instanceof Error && error.message === "Ticket not found") {
-        return res.status(404).json({ error: error.message });
-      }
-      res.status(400).json({ error: getErrorMessage(error) });
-    }
+    const commentData = parseOrThrow(addCommentSchema, req.body);
+    const comment = ticketsService.addComment(req.params.id, commentData);
+    res.status(201).json(comment);
   }
 }
 

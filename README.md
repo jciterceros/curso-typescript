@@ -261,12 +261,12 @@ A suite cobre os cenarios principais de fluxo:
 ## Documentacao complementar
 
 
-**Quer entender o projeto?** Leia [README](./README.md)
+**Quer entender o projeto?** Leia [README](./docs/README.md)
 
-**Quer entender todos endpoints?** Veja [API Reference](./API_REFERENCE.md)
+**Quer entender todos endpoints?** Veja [API Reference](./docs/API_REFERENCE.md)
 
-**Quer ver o modelo?** Confira [C4](./c4/README.md)
+**Quer ver o modelo?** Confira [C4](./docs/c4/README.md)
 
-**Quer entender os fluxos?** Veja [Fluxos](./fluxos/README.md)
+**Quer entender os fluxos?** Veja [Fluxos](./docs/fluxos/README.md)
 
-**Quer entender as decisoes de arquitetura?** Veja [ADR](./adr/README.md)
+**Quer entender as decisoes de arquitetura?** Veja [ADR](./docs/adr/README.md)

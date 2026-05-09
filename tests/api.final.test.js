@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from "../src/app.ts";
 import { resetCommentsRepository } from "../src/repositories/comments.repository.ts";
 import { resetTicketsRepository } from "../src/repositories/tickets.repository.ts";
+import { ERROR_CODES } from "../src/constants/error-codes.ts";
 
 describe('Helpdesk API - contrato final da migracao', () => {
   let api;
@@ -63,14 +64,25 @@ describe('Helpdesk API - contrato final da migracao', () => {
   });
 
   it('rejeita query params invalidos', async () => {
-    await api
-      .get('/tickets')
-      .query({ status: 'closedd', priority: 'alta', limit: '0', page: '-1' })
-      .expect(400);
+    const response = await api.get("/tickets").query({ status: "closedd", priority: "alta", limit: "0", page: "-1" }).expect(400);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        error: "Invalid request",
+      }),
+    );
   });
 
   it("rejeita query param de prioridade vazio", async () => {
-    await api.get("/tickets").query({ priority: "" }).expect(400);
+    const response = await api.get("/tickets").query({ priority: "" }).expect(400);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        error: "Invalid request",
+      }),
+    );
   });
 
   it('retorna detalhes do ticket com comentarios e trata 404', async () => {
@@ -84,7 +96,11 @@ describe('Helpdesk API - contrato final da migracao', () => {
       }),
     );
 
-    await api.get('/tickets/ticket-inexistente').expect(404);
+    const notFoundResponse = await api.get("/tickets/ticket-inexistente").expect(404);
+    expect(notFoundResponse.body).toEqual({
+      code: ERROR_CODES.TICKET_NOT_FOUND,
+      error: "Ticket not found",
+    });
   });
 
   it('retorna resumo usando description em vez de uma propriedade inexistente', async () => {
@@ -102,7 +118,12 @@ describe('Helpdesk API - contrato final da migracao', () => {
   });
 
   it("retorna 404 ao buscar resumo de ticket inexistente", async () => {
-    await api.get("/tickets/ticket-inexistente/summary").expect(404);
+    const response = await api.get("/tickets/ticket-inexistente/summary").expect(404);
+
+    expect(response.body).toEqual({
+      code: ERROR_CODES.TICKET_NOT_FOUND,
+      error: "Ticket not found",
+    });
   });
 
   it('cria ticket valido e converte priority para number', async () => {
@@ -141,15 +162,22 @@ describe('Helpdesk API - contrato final da migracao', () => {
   });
 
   it('rejeita payload invalido na criacao de ticket', async () => {
-    await api
-      .post('/tickets')
+    const response = await api
+      .post("/tickets")
       .send({
-        title: 'Oi',
-        description: 'x',
-        status: 'closedd',
-        priority: 'alta',
+        title: "Oi",
+        description: "x",
+        status: "closedd",
+        priority: "alta",
       })
       .expect(400);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        error: "Invalid request",
+      }),
+    );
   });
 
   it('atualiza apenas campos permitidos no PATCH', async () => {
@@ -177,21 +205,40 @@ describe('Helpdesk API - contrato final da migracao', () => {
   });
 
   it('rejeita PATCH com campos invalidos', async () => {
-    await api
-      .patch('/tickets/t1')
+    const response = await api
+      .patch("/tickets/t1")
       .send({
-        status: 'closedd',
-        priority: 'alta',
+        status: "closedd",
+        priority: "alta",
       })
       .expect(400);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        error: "Invalid request",
+      }),
+    );
   });
 
   it("rejeita PATCH com body vazio", async () => {
-    await api.patch("/tickets/t1").send({}).expect(400);
+    const response = await api.patch("/tickets/t1").send({}).expect(400);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        error: "Invalid request",
+      }),
+    );
   });
 
   it("retorna 404 ao atualizar ticket inexistente", async () => {
-    await api.patch("/tickets/ticket-inexistente").send({ status: "closed" }).expect(404);
+    const response = await api.patch("/tickets/ticket-inexistente").send({ status: "closed" }).expect(404);
+
+    expect(response.body).toEqual({
+      code: ERROR_CODES.TICKET_NOT_FOUND,
+      error: "Ticket not found",
+    });
   });
 
   it("adiciona comentario em ticket existente e retorna 404 para ticket ausente", async () => {
@@ -211,13 +258,18 @@ describe('Helpdesk API - contrato final da migracao', () => {
       }),
     );
 
-    await api
+    const notFoundResponse = await api
       .post("/tickets/ticket-inexistente/comments")
       .send({
         authorId: "u2",
         message: "Nao deve ser criado.",
       })
       .expect(404);
+
+    expect(notFoundResponse.body).toEqual({
+      code: ERROR_CODES.TICKET_NOT_FOUND,
+      error: "Ticket not found",
+    });
 
     const ticketResponse = await api.get("/tickets/t1").expect(200);
 
@@ -234,13 +286,20 @@ describe('Helpdesk API - contrato final da migracao', () => {
   });
 
   it("rejeita comentario com payload invalido", async () => {
-    await api
+    const response = await api
       .post("/tickets/t1/comments")
       .send({
         authorId: "",
         message: "",
       })
       .expect(400);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        error: "Invalid request",
+      }),
+    );
   });
 
   it('lista usuarios cadastrados', async () => {

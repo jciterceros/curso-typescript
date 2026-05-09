@@ -58,7 +58,7 @@ class TicketsService {
       title: ticket.title,
       short_desc: ticket.description,
       assigned_to: ticket.assigneeId,
-      created: ticket.createdAt.toLocaleDateString()
+      created: ticket.createdAt.toISOString()
     };
   }
 

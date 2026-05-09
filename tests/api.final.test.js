@@ -111,7 +111,7 @@ describe('Helpdesk API - contrato final da migracao', () => {
         title: 'Erro no login',
         short_desc: expect.any(String),
         assigned_to: 'u1',
-        created: expect.any(String),
+        created: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
       }),
     );
     expect(response.body.short_desc).toBeTruthy();

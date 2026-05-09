@@ -19,6 +19,9 @@ describe("Helpdesk API - contrato final da migracao", () => {
     expect(response.body).toEqual({
       data: expect.any(Array),
       total: expect.any(Number),
+      page: 1,
+      limit: 10,
+      totalPages: expect.any(Number),
     });
 
     expect(response.body.data.length).toBeGreaterThan(0);
@@ -109,12 +112,12 @@ describe("Helpdesk API - contrato final da migracao", () => {
     expect(response.body).toEqual(
       expect.objectContaining({
         title: "Erro no login",
-        short_desc: expect.any(String),
-        assigned_to: "u1",
+        shortDesc: expect.any(String),
+        assignedTo: "u1",
         created: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
       }),
     );
-    expect(response.body.short_desc).toBeTruthy();
+    expect(response.body.shortDesc).toBeTruthy();
   });
 
   it("retorna 404 ao buscar resumo de ticket inexistente", async () => {
@@ -180,6 +183,31 @@ describe("Helpdesk API - contrato final da migracao", () => {
     );
   });
 
+  it("rejeita criacao com assigneeId inexistente", async () => {
+    const response = await api
+      .post("/tickets")
+      .send({
+        title: "Falha no acesso VPN",
+        description: "Usuario nao consegue conectar na rede corporativa",
+        status: "open",
+        priority: "3",
+        assigneeId: "u999",
+      })
+      .expect(400);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        error: "Invalid request",
+      }),
+    );
+    expect(response.body.details).toEqual(
+      expect.objectContaining({
+        assigneeId: "Assignee not found",
+      }),
+    );
+  });
+
   it("atualiza apenas campos permitidos no PATCH", async () => {
     const before = await api.get("/tickets/t1").expect(200);
 
@@ -228,6 +256,22 @@ describe("Helpdesk API - contrato final da migracao", () => {
       expect.objectContaining({
         code: ERROR_CODES.INVALID_REQUEST,
         error: "Invalid request",
+      }),
+    );
+  });
+
+  it("rejeita PATCH com assigneeId inexistente", async () => {
+    const response = await api.patch("/tickets/t1").send({ assigneeId: "u999" }).expect(400);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        code: ERROR_CODES.INVALID_REQUEST,
+        error: "Invalid request",
+      }),
+    );
+    expect(response.body.details).toEqual(
+      expect.objectContaining({
+        assigneeId: "Assignee not found",
       }),
     );
   });

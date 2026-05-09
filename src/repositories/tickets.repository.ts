@@ -39,32 +39,31 @@ export function resetTicketsRepository(): void {
 
 class TicketsRepository {
   findAll(): Ticket[] {
-    return tickets;
+    return tickets.map(cloneTicket);
   }
 
   findById(id: string): Ticket | null {
     const ticket = tickets.find(t => t.id === id);
-    return ticket || null;
+    return ticket ? cloneTicket(ticket) : null;
   }
 
   create(data: CreateTicketDto): Ticket {
-    const newTicket = {
+    const newTicket: Ticket = {
       id: generateId(),
       ...data,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     tickets.push(newTicket);
-    return newTicket;
+    return cloneTicket(newTicket);
   }
 
   update(id: string, data: UpdateTicketDto): Ticket | null {
     const index = tickets.findIndex(t => t.id === id);
     if (index === -1) return null;
 
-    const updatedTicket = Object.assign(tickets[index], data, { updatedAt: new Date() });
-    tickets[index] = updatedTicket;
-    return updatedTicket;
+    tickets[index] = { ...tickets[index], ...data, updatedAt: new Date() };
+    return cloneTicket(tickets[index]);
   }
 }
 

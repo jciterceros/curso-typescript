@@ -14,7 +14,7 @@
 | **Segurança**            | ✅ Bom       | Validações completas, sem vulnerabilidades |
 | **Duplicação de Código** | ✅ Baixa     | Clonagem removida (exceto comments)        |
 | **Complexidade**         | ✅ Baixa     | Métodos bem delimitados                    |
-| **Cobertura de Testes**  | ✅ Alta      | 44/44 testes passando                      |
+| **Cobertura de Testes**  | ✅ Alta      | 52/52 testes passando                      |
 | **Observabilidade**      | ✅ Excelente | Logger estruturado com Pino                |
 
 ---
@@ -364,7 +364,7 @@ export const env = envSchema.parse(process.env);
 | **Tipagem TypeScript**        | ✅ Strict mode, interfaces bem definidas         |
 | **Validação com Zod**         | ✅ Todos endpoints cobertos                      |
 | **Tratamento de Erros**       | ✅ AppError customizado, middleware centralizado |
-| **Testes**                    | ✅ 11/11 passando, cobertura alta                |
+| **Testes**                    | ✅ 52/52 passando, cobertura alta                |
 | **Estrutura de Camadas**      | ✅ Controllers → Services → Repositories         |
 | **Logging com Sensibilidade** | ✅ Redação de dados sensíveis                    |
 | **Request Tracing**           | ✅ Request ID em cada requisição                 |
@@ -406,7 +406,7 @@ CRITICIDADE:
 - [x] Adicionar validação de IDs de rota
 - [x] Implementar logger estruturado (pino)
 
-**Tempo Real**: ~6 horas | **Testes**: 44/44 passando
+**Tempo Real**: ~6 horas | **Testes**: 52/52 passando
 
 ### **Sprint 2 - Importante** (Próximos)
 
@@ -430,7 +430,7 @@ CRITICIDADE:
 | Métrica                  | Antes | Depois | Meta  | Status |
 | ------------------------ | ----- | ------ | ----- | ------ |
 | TypeScript Coverage      | 100%  | 100%   | 100%  | ✅     |
-| Test Pass Rate           | 11/11 | 44/44  | 100%  | ✅     |
+| Test Pass Rate           | 11/11 | 52/52  | 100%  | ✅     |
 | Linting Issues           | 0     | 0      | 0     | ✅     |
 | Type Errors              | 0     | 0      | 0     | ✅     |
 | Critical Issues Resolved | 0     | 5/5    | -     | ✅     |
@@ -476,7 +476,7 @@ CRITICIDADE:
 
 **Tempo Investido**: ~6 horas  
 **Impacto**: Alto (core quality + production-readiness)  
-**Código Verde**: ✅ Lint + Format + Build + Typecheck + Tests (44/44)
+**Código Verde**: ✅ Lint + Format + Build + Typecheck + Tests (52/52)
 
 ---
 

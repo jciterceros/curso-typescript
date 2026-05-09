@@ -248,6 +248,14 @@ Para validar o contrato esperado da API:
 npm test
 ```
 
+Para gerar o relatorio de cobertura:
+
+```bash
+npm run test:cov
+```
+
+![Coverage report](./coverage.png)
+
 A suite cobre os cenarios principais de fluxo:
 
 - payload valido e invalido
